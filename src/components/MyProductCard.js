@@ -1,20 +1,17 @@
-import { Clock, MapPin } from "lucide-react";
+import { Clock, MapPin, Pencil } from "lucide-react";
 import Badge from "@mui/material/Badge";
 
-export function ProductCard({ user, product, timeLeft, onBidClick }) {
+export function MyProductCard({ user, product, timeLeft, onBidClick }) {
   const getTimeLeftColor = (timeLeft) => {
     if (timeLeft.includes("m")) return "bg-red-100 text-red-800";
     if (timeLeft.includes("h")) return "bg-yellow-100 text-yellow-800";
     return "bg-green-100 text-green-800";
   };
 
-  let current_bid = product.all_bids.filter((a) => {
-    if (user && a.name === user.username) {
-      return true;
-    }
-    return false;
+  const winner = product.all_bids.filter((bid) => {
+    if (bid.status === "Accepted" || bid.status === "Awarded") return true;
   });
-
+  console.log("Winner: ", winner);
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
       <div className="relative">
@@ -44,11 +41,20 @@ export function ProductCard({ user, product, timeLeft, onBidClick }) {
       <div className="p-5">
         <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
           <h3 className="font-semibold first-letter-caps  text-lg text-gray-900 mb-2">
-            {product.name}
-          </h3>
-          <p className="text-gray-600 text-sm mb-3 line-clamp-2">
             {product.product} - {product.weight} kg
-          </p>
+          </h3>
+          <button
+            className={`w-10 h-10 shadow-xl rounded-full flex items-center justify-center text-xl
+    ${
+      product.status.toLowerCase() !== "open"
+        ? "hover:cursor-not-allowed hover:bg-gray-300"
+        : "hover:bg-green-600 hover:text-black"
+    }`}
+            disabled={product.status.toLowerCase() !== "open"}
+            onClick={() => onBidClick(product, "load_update_modal")}
+          >
+            <Pencil className="w-6 h-6 mr-1" />
+          </button>
         </div>
         <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
           <span className="flex items-center">
@@ -73,14 +79,10 @@ export function ProductCard({ user, product, timeLeft, onBidClick }) {
         <div className="border-t border-gray-200 pt-3">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <p className="text-xs text-gray-500">Current Bid</p>
+              <p className="text-xs text-gray-500">Maximum Bid made</p>
               <p className="text-xl font-bold text-farm-green-600">
                 Rs.{" "}
-                {parseFloat(
-                  current_bid[0] && current_bid[0].submit_amount
-                    ? current_bid[0].submit_amount
-                    : 0
-                ).toFixed(2)}
+                {parseFloat(product?.max_bid?.submit_amount || 0).toFixed(2)}
               </p>
             </div>
             <div className="text-right">
@@ -90,12 +92,20 @@ export function ProductCard({ user, product, timeLeft, onBidClick }) {
               </p>
             </div>
           </div>
-          <button
-            onClick={onBidClick}
-            className="w-full p-2  farm-green-600 hover:farm-green-700 text-white"
-          >
-            Place Bid
-          </button>
+          {timeLeft !== ("Accepted" || "Awarded") ? (
+            <button
+              onClick={() => onBidClick(product, "accept_modal")}
+              className="w-full p-2  farm-green-600 hover:farm-green-700 text-white"
+            >
+              Accept Bid on your product
+            </button>
+          ) : (
+            <p className="text-farm-green-600">
+              Winner is <span className="font-bold">{winner[0].name}</span> with
+              bid amount{" "}
+              <span className="font-bold ">Rs. {winner[0].submit_amount}</span>
+            </p>
+          )}
         </div>
       </div>
     </div>

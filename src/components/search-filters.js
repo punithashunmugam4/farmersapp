@@ -46,7 +46,7 @@ export default function SearchFilters({ onFiltersChange }) {
                 type="text"
                 placeholder="Search for products..."
                 value={search}
-                onChange={(e) => handleSearchChange(e.target.value)}
+                onChange={handleSearchChange}
                 className="pl-10 h-12 focus:ring-2 focus:ring-farm-green-500 focus:border-transparent"
               />
             </div>

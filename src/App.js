@@ -25,10 +25,7 @@ function App() {
       return false;
     }
     if (res.username) {
-      let user_details = await get_my_user_details(base_url, token);
-      setUser(user_details);
-      setIsSessionValid(true);
-      return true;
+      return res;
     }
   };
   // useEffect(() => {
@@ -39,46 +36,18 @@ function App() {
     <TooltipProvider>
       <Router>
         <Routes>
-          {
-            /* <Route
+          <Route
             path="/"
             element={
-              sessionStorage.getItem("user_type") === null ||
-              sessionStorage.getItem("user_type") === "" ||
-              sessionStorage.getItem("user_type") === "null" ? (
-                <Profile
-                  validateSession={validateSession}
-                  user={user}
-                  setUser={setUser}
-                />
-              ) : sessionStorage.getItem("user_type") === "buyer" ? (
-                <Buyer
-                  validateSession={validateSession}
-                  user={user}
-                  setUser={setUser}
-                />
-              ) : (
-                <Seller  
-                  validateSession={validateSession}
-                  user={user}
-                  setUser={setUser}
-                />
-              )
+              <Home
+                isSessionValid={isSessionValid}
+                setIsSessionValid={setIsSessionValid}
+                validateSession={validateSession}
+                user={user}
+                setUser={setUser}
+              />
             }
-          /> */
-
-            <Route
-              path="/"
-              element={
-                <Home
-                  isSessionValid={isSessionValid}
-                  setIsSessionValid={setIsSessionValid}
-                  validateSession={validateSession}
-                  user={user}
-                />
-              }
-            />
-          }
+          />
           <Route
             path="/login"
             element={
@@ -98,7 +67,9 @@ function App() {
               <MyBids
                 isSessionValid={isSessionValid}
                 setIsSessionValid={setIsSessionValid}
+                validateSession={validateSession}
                 user={user}
+                setUser={setUser}
               />
             }
           />
@@ -108,7 +79,9 @@ function App() {
               <MyProducts
                 isSessionValid={isSessionValid}
                 setIsSessionValid={setIsSessionValid}
+                validateSession={validateSession}
                 user={user}
+                setUser={setUser}
               />
             }
           />

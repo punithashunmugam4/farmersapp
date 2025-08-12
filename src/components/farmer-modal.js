@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,9 +9,17 @@ import {
   MenuItem,
   Checkbox,
 } from "@mui/material";
-import { useToast } from "./hooks/use-toast.ts";
 import { styled } from "@mui/material/styles";
-import { CloudUpload } from "lucide-react";
+import { CloudUpload, X } from "lucide-react";
+import dayjs from "dayjs";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { add_new_load } from "../api_call";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { isCookie } from "react-router";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -24,38 +32,132 @@ const VisuallyHiddenInput = styled("input")({
   whiteSpace: "nowrap",
   width: 1,
 });
+const sleep = async (ms) =>
+  await new Promise((resolve) => setTimeout(resolve, ms));
 
-export function FarmerModal({ isOpen, onClose }) {
+export function FarmerModal({ user, isOpen, onClose, product }) {
   const [formData, setFormData] = useState({
     name: "",
-    category: "",
+    category: "none",
     description: "",
     quantity: "",
-    unit: "lbs",
+
+    unit: "kg",
     startingPrice: "",
     auctionDuration: "24",
     location: "",
     isOrganic: false,
+    pick_up_range_start_date: dayjs(),
+    pick_up_range_end_date: dayjs(),
     auctionViewers: [],
   });
-  console.log(formData.isOrganic);
-  const { toast } = useToast();
+  const formatDate = (time) => {
+    let t = dayjs(time).format("YYYY-MM-DD HH:mm:ss");
+    return t;
+  };
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    console.log("Running UseEffect in FarmerModal.js");
+    console.log("farmer modal product in: ", product);
+    console.log("farmer modal User in: ", user);
+    if (user) {
+      setFormData({
+        name: product?.product || "",
+        category: product?.category || "none",
+        description: product?.additional_info || "",
+        quantity: product?.weight || "",
+        unit: "kg",
+        startingPrice: product?.min_bid || "",
+        auctionDuration: product?.auction_time_hrs || "24",
+        location:
+          product?.product_location.join(", ") || user
+            ? `${user.address}, ${user.city}, ${user.state}, ${
+                user.country || "India"
+              } - ${user.zipcode}`
+            : "",
+        isOrganic: false,
+        pick_up_range_start_date: product?.pick_up_range_start_date
+          ? dayjs(product?.pick_up_range_start_date)
+          : dayjs(),
+        pick_up_range_end_date: product?.pick_up_range_end_date
+          ? dayjs(product?.pick_up_range_end_date)
+          : dayjs(),
+        auctionViewers: [],
+      });
+      // console.log("User details in FarmerModal:", user);
+      // console.log("Initial formData:", formData);
+    }
+  }, [user, isOpen]);
+
+  const now = new Date(Date.now());
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Submitting form data:", formData);
+    let location = formData.location.split(", ");
+    let zip = formData.location.split("-").pop().trim();
+    const loadDetails = {
+      name: user?.username,
+      email: user?.email,
+      product: formData.name,
+      category: formData.category,
+      additional_info: formData.description,
+      weight: formData.quantity,
+      contact: user?.contact,
+      auction_time_hrs: formData.auctionDuration,
+      min_bid: formData.startingPrice,
+      product_location: [
+        {
+          address: location[0],
+          city: location[1],
+          state: location[2],
+          country: location[3],
+          zip: zip,
+        },
+      ],
+      status: "Open",
+      pick_up_range_start_date: formatDate(formData.pick_up_range_start_date),
+      pick_up_range_end_date: formatDate(formData.pick_up_range_end_date),
+      visible_user: formData.auctionViewers,
+    };
+    console.log("Load details to be sent:", loadDetails);
+
+    add_new_load(
+      "http://localhost:3500/api/",
+      sessionStorage.getItem("session_token_farmersapp"),
+      loadDetails
+    )
+      .then(async (response) => {
+        console.log("Load added successfully:", response);
+        if (
+          response.ok &&
+          (response.status === 200 || response.status === 201)
+        ) {
+          console.log(response.ok, response.status);
+          toast.success("🚀 Load added successfully!");
+          await sleep(2000);
+          onClose();
+        } else {
+          toast.error("Failed to add load. Please try again.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error adding load:", error);
+        toast.error("Failed to add load. Please try again.");
+      });
   };
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    console.log(formData);
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto ">
-        <DialogTitle>
-          <Dialog>List Your Product</Dialog>
-        </DialogTitle>
-
+    <Dialog open={isOpen} className="relative">
+      <button onClick={onClose}>
+        <X className="absolute w-8 h-8 -top-0 -right-0 bg-farm-red-400  p-1 shadow-md text-red hover:bg-farm-red-500 " />
+      </button>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto no-scrollbar ">
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -63,16 +165,16 @@ export function FarmerModal({ isOpen, onClose }) {
               <Input
                 id="name"
                 placeholder="e.g., Premium Tomatoes"
-                value={formData.name}
+                value={formData?.name}
                 onChange={(e) => handleInputChange("name", e.target.value)}
                 required
               />
             </div>
             <div>
               <Select
-                value={formData.category === "" ? "none" : formData.category}
+                value={formData?.category}
                 placeholder="Select Category"
-                onChange={(value) => handleInputChange("category", value)}
+                onChange={(e) => handleInputChange("category", e.target.value)}
               >
                 <MenuItem value="none">Select Category</MenuItem>
                 <MenuItem value="Vegetables">Vegetables</MenuItem>
@@ -111,12 +213,12 @@ export function FarmerModal({ isOpen, onClose }) {
             </div>
             <div>
               <Select
-                value={formData.unit ? formData.unit : "lbs"}
+                value={formData?.unit}
                 placeholder="Select Unit"
                 onChange={(e) => handleInputChange("unit", e.target.value)}
               >
-                <MenuItem value="lbs">kg</MenuItem>
-                <MenuItem value="kg">lbs</MenuItem>
+                <MenuItem value="kg">kg</MenuItem>
+                <MenuItem value="lbs">lbs</MenuItem>
                 <MenuItem value="pieces">pieces</MenuItem>
                 <MenuItem value="bundles">bundles</MenuItem>
                 <MenuItem value="bushels">bushels</MenuItem>
@@ -150,9 +252,7 @@ export function FarmerModal({ isOpen, onClose }) {
                 Auction Duration
               </label>
               <Select
-                value={
-                  formData.auctionDuration ? formData.auctionDuration : "168"
-                }
+                value={formData?.auctionDuration}
                 placeholder="Select Duration"
                 onChange={(e) =>
                   handleInputChange("auctionDuration", e.target.value)
@@ -172,13 +272,31 @@ export function FarmerModal({ isOpen, onClose }) {
               </label>
               <Input
                 id="location"
-                placeholder="City, State"
+                placeholder="Address, City, State, Zip"
                 value={formData.location}
-                onChange={(e) => handleInputChange("location", e.target.value)}
+                onInput={(e) => handleInputChange("location", e.target.value)}
                 required
               />
             </div>
           </div>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DemoContainer components={["DatePicker", "DatePicker"]}>
+              <DatePicker
+                label="Pickup Range Start"
+                value={formData.pick_up_range_start_date}
+                onChange={(value) =>
+                  handleInputChange("pick_up_range_start_date", value)
+                }
+              />
+              <DatePicker
+                label="Pickup Range End"
+                value={formData.pick_up_range_end_date}
+                onChange={(value) =>
+                  handleInputChange("pick_up_range_end_date", value)
+                }
+              />
+            </DemoContainer>
+          </LocalizationProvider>
           <div>
             <label htmlFor="auctionviewers" className="mr-4">
               Auction viewers
@@ -189,10 +307,7 @@ export function FarmerModal({ isOpen, onClose }) {
               placeholder="Comma separated emails"
               value={formData.auctionViewers}
               onChange={(e) => {
-                let viewers = formData.auctionViewers;
-                let newValue = e.target.value.split(",").map((v) => v.trim());
-                viewers.push(...newValue);
-                handleInputChange("auctionViewers", viewers);
+                handleInputChange("auctionViewers", e.target.value);
               }}
             />
           </div>
@@ -232,18 +347,19 @@ export function FarmerModal({ isOpen, onClose }) {
               <Button
                 type="button"
                 variant="outline"
-                className="flex-1"
+                className="flex-1 hover:text-white hover:bg-farm-red-500"
                 onClick={onClose}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="flex-1 farm-green-600 hover:bg-farm-green-700"
+                className="flex-1 hover:text-white hover:farm-green-500"
                 disabled={false}
               >
                 Submit
               </Button>
+              <ToastContainer position="top-right" autoClose={2000} />
             </div>
           </div>
         </form>

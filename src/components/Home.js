@@ -4,18 +4,25 @@ import { Footer } from "./footer.js";
 import { BidModal } from "./bid-modal.js";
 import { FarmerModal } from "./farmer-modal.js";
 import { ProductCard } from "./product-card.js";
-import { Button } from "@mui/material";
 import { Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 import Navigation from "./navigation.js";
 import HeroSection from "./hero-section.js";
 import SearchFilters from "./search-filters.js";
-import { validateSession_call, get_all_loads } from "../api_call.js";
-import { useNavigate } from "react-router-dom";
+import {
+  get_all_loads,
+  get_my_user_details,
+  validateSession_call,
+} from "../api_call.js";
 const base_url = "http://localhost:3500/api/";
 
-const Home = ({ isSessionValid, setIsSessionValid, validateSession, user }) => {
-  const navigate = useNavigate();
+const Home = ({
+  isSessionValid,
+  setIsSessionValid,
+  validateSession,
+  user,
+  setUser,
+}) => {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // test - change to true for initial loading state
   const [filters, setFilters] = useState(null);
@@ -23,49 +30,116 @@ const Home = ({ isSessionValid, setIsSessionValid, validateSession, user }) => {
   const [showBidModal, setShowBidModal] = useState(false);
   const [showFarmerModal, setShowFarmerModal] = useState(false);
   // test - change to false for initial session invalid state
-  console.log("User: ", user);
+  // console.log("User: ", user);
   useEffect(() => {
     console.log("Running UseEffect in home.js");
     (async () => {
-      let tempSession = await validateSession();
-      if (tempSession) {
+      let token = sessionStorage.getItem("session_token_farmersapp");
+      const validateSession_x = async () => {
+        const token = sessionStorage.getItem("session_token_farmersapp");
+        let res = await validateSession_call(base_url, token);
+        if (res === false) {
+          setUser(null);
+          return false;
+        }
+        if (res.username) {
+          return res;
+        }
+      };
+      console.log("Validating session in Home.js");
+      let tempSession = await validateSession_x();
+      if (tempSession === false) {
+        console.log("Session is invalid, redirecting to login page.");
+        setIsSessionValid(false);
+        setIsLoading(false);
+        // navigate("/login");
+      } else if (tempSession.username) {
+        console.log("Get usedetails in Home.js");
+        let user_details = await get_my_user_details(base_url, token);
+        setUser(user_details);
         setIsSessionValid(true);
         setIsLoading(true);
+        console.log("Fetching products in Home.js");
         let visibleLoads = await get_all_loads(
           base_url,
           sessionStorage.getItem("session_token_farmersapp")
         );
-        setProducts(visibleLoads);
+
+        if (filters === null) {
+          setProducts(visibleLoads);
+        } else {
+          console.log("Filter:: ", filters);
+          setProducts(() => {
+            visibleLoads = visibleLoads.filter((product) => {
+              if (
+                filters.category === "" ||
+                product.category.toLowerCase() ===
+                  filters.category.toLowerCase()
+              ) {
+                console.log("Category match: ", product.category);
+                return true;
+              } else return false;
+            });
+
+            visibleLoads = visibleLoads.filter((product) => {
+              if (
+                filters.location === "" ||
+                JSON.stringify(product.product_location)
+                  .toLowerCase()
+                  .includes(filters.location.toLowerCase())
+              ) {
+                console.log("Location match: ", product.product_location);
+                return true;
+              } else return false;
+            });
+            visibleLoads = visibleLoads.filter((product) => {
+              if (
+                filters.search === "" ||
+                product?.auction_id.toString().includes(filters.search) ||
+                product?.product
+                  .toLowerCase()
+                  .includes(filters.search.toLowerCase()) ||
+                product?.name
+                  .toLowerCase()
+                  .includes(filters.search.toLowerCase()) ||
+                JSON.stringify(product.product_location).includes(
+                  filters.search
+                )
+              ) {
+                console.log("Search found: ", product);
+                return true;
+              } else return false;
+            });
+            return visibleLoads;
+          });
+        }
 
         setIsLoading(false);
-      } else {
-        console.log("Session is invalid, redirecting to login page.");
-        setIsSessionValid(false);
-        setIsLoading(false);
-        navigate("/login");
       }
     })();
-  }, []);
+  }, [isSessionValid, showFarmerModal, showBidModal, filters]);
   console.log("Fetching products...", products);
+  console.log("Fetching user details...", user);
   const handleBidClick = (product) => {
     setSelectedProduct(product);
     setShowBidModal(true);
   };
 
-  const handleFiltersChange = (newFilters) => {
-    setFilters(newFilters);
-  };
-
-  const getBidCount = (productId) => {
-    // Mock bid count for display
-    return Math.floor(Math.random() * 20) + 5;
-  };
-
-  const getTimeLeft = (endTime) => {
+  const getTimeLeft = (auction_hrs, created_time) => {
     const now = new Date();
-    const end = new Date(endTime);
-    const diff = end.getTime() - now.getTime();
-
+    const start_time = new Date(
+      created_time.split("T")[0] +
+        " " +
+        created_time.split("T")[1].split(".")[0]
+    );
+    // console.log("Start time:", start_time);
+    // console.log("Current time:", now);
+    const end_time = new Date(
+      start_time.setHours(start_time.getHours() + auction_hrs)
+    );
+    // console.log("End time:", end_time);
+    const diff = end_time.getTime() - now.getTime();
+    // console.log("Time left calculation:", diff);
     if (diff <= 0) return "Ended";
 
     const hours = Math.floor(diff / (1000 * 60 * 60));
@@ -76,9 +150,9 @@ const Home = ({ isSessionValid, setIsSessionValid, validateSession, user }) => {
       return `${days}d left`;
     }
     if (hours > 0) {
-      return `${hours}h left`;
+      return `${hours}hrs left`;
     }
-    return `${minutes}m left`;
+    return `${minutes}mins left`;
   };
 
   return (
@@ -86,9 +160,10 @@ const Home = ({ isSessionValid, setIsSessionValid, validateSession, user }) => {
       <Navigation
         isSessionValid={isSessionValid}
         setIsSessionValid={setIsSessionValid}
+        user={user}
       />
       <HeroSection setShowFarmerModal={setShowFarmerModal} />
-      <SearchFilters onFiltersChange={handleFiltersChange} />
+      <SearchFilters onFiltersChange={setFilters} />
       <section id="products" className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
@@ -121,16 +196,29 @@ const Home = ({ isSessionValid, setIsSessionValid, validateSession, user }) => {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {products.length > 0 &&
-                products.map((product) => (
-                  <ProductCard
-                    user={user}
-                    key={product.auction_id}
-                    product={product}
-                    bidCount={getBidCount(product.auction_id)}
-                    timeLeft={getTimeLeft(product.auction_time_hrs.toString())}
-                    onBidClick={() => handleBidClick(product)}
-                  />
-                ))}
+                products.map((product) => {
+                  let timeleft = getTimeLeft(
+                    4,
+                    "2025-08-12T20:11:23.000Z" // product.auction_time_hrs,
+                    //  product.createdAt
+                  );
+                  if (
+                    timeleft === "Ended" ||
+                    product.status === "Closed" ||
+                    product.status === "Accepted"
+                  )
+                    return;
+                  else
+                    return (
+                      <ProductCard
+                        user={user}
+                        key={product.auction_id}
+                        product={product}
+                        timeLeft={timeleft}
+                        onBidClick={() => handleBidClick(product)}
+                      />
+                    );
+                })}
             </div>
           )}
 
@@ -144,7 +232,7 @@ const Home = ({ isSessionValid, setIsSessionValid, validateSession, user }) => {
         </div>
       </section>
 
-      <StatisticsSection />
+      {/* <StatisticsSection /> */}
       <HowItWorksSection />
       <Footer />
 
