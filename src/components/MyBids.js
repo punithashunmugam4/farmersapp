@@ -116,7 +116,7 @@ const MyBids = ({
         setIsLoading(false);
       }
     })();
-  }, [isSessionValid, showBidModal, filters]);
+  }, [isSessionValid, showBidModal, filters, setIsSessionValid, setUser]);
 
   const handleBidClick = (product, modal) => {
     setSelectedProduct(product);

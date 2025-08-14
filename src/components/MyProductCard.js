@@ -10,6 +10,7 @@ export function MyProductCard({ user, product, timeLeft, onBidClick }) {
 
   const winner = product.all_bids.filter((bid) => {
     if (bid.status === "Accepted" || bid.status === "Awarded") return true;
+    else return false;
   });
   console.log("Winner: ", winner);
   return (

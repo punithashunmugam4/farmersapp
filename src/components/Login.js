@@ -21,7 +21,7 @@ const Login = ({
     if (isSessionValid) {
       navigate("/");
     }
-  }, []);
+  }, [isSessionValid, navigate]);
 
   // (async () => {
   //   if (sessionStorage.getItem("session_token_farmersapp") !== null) {

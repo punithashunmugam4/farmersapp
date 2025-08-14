@@ -46,7 +46,7 @@ const signup = async (base_url, user_details) => {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    const data = await response.json();
+
     return response;
   } catch (error) {
     console.error("Error updating user details:", error);
@@ -204,7 +204,7 @@ const update_user_details = async (base_url, session_token, user_details) => {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    const data = await response.json();
+
     return response;
   } catch (error) {
     console.error("Error updating user details:", error);
@@ -226,7 +226,7 @@ const add_new_load = async (base_url, session_token, load_details) => {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    const data = await response.json();
+
     return response;
   } catch (error) {
     console.error("Error adding new load:", error);
@@ -248,7 +248,7 @@ const add_bid = async (base_url, session_token, bid_details) => {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    const data = await response.json();
+
     return response;
   } catch (error) {
     console.error("Error adding bid:", error);

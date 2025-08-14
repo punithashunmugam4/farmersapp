@@ -1,4 +1,3 @@
-import { StatisticsSection } from "./statistics-section.js";
 import { HowItWorksSection } from "./how-it-works-section.js";
 import { Footer } from "./footer.js";
 import { BidModal } from "./bid-modal.js";
@@ -138,7 +137,14 @@ const Home = ({
         setIsLoading(false);
       }
     })();
-  }, [isSessionValid, showFarmerModal, showBidModal, filters]);
+  }, [
+    isSessionValid,
+    showFarmerModal,
+    showBidModal,
+    filters,
+    setUser,
+    setIsSessionValid,
+  ]);
   console.log("Fetching products...", products);
   console.log("Fetching user details...", user);
   const handleBidClick = (product) => {

@@ -35,12 +35,12 @@ export default function Navigation({
                 >
                   Sell Products
                 </Link>
-                <a
-                  href="#"
+                <Link
+                  to="/"
                   className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm"
                 >
                   How It Works
-                </a>
+                </Link>
               </div>
             </div>
           </div>

@@ -17,7 +17,7 @@ export function AcceptModal({ user, product, isOpen, onClose }) {
         ? product?.all_bids.some((bid) => {
             if (bid.status === "Accepted") {
               return true;
-            }
+            } else return false;
           })
         : false
     );
@@ -41,7 +41,7 @@ export function AcceptModal({ user, product, isOpen, onClose }) {
       });
       console.log(updated_all_bids);
       let res = await update_bid_status(
-         process.env.REACT_APP_API_URL,
+        process.env.REACT_APP_API_URL,
         sessionStorage.getItem("session_token_farmersapp"),
         {
           auction_id: product.auction_id,

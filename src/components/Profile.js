@@ -15,18 +15,7 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
   const [showPassword, setShowPassword] = useState(false);
   const userRef = useRef(null);
   console.log("Profile: ", user);
-  const [form, setForm] = useState({
-    // name: user?.name || "",
-    // email: user?.email || "",
-    // address: user?.address || "",
-    // city: user?.city || "",
-    // state: user?.state || "",
-    // zipcode: user?.zipcode || "",
-    // country: user?.country || "",
-    // contact: user?.contact || "",
-    // dob: user?.dob ? user.dob.slice(0, 10) : "",
-    // contract_users: user?.contract_users || [],
-  });
+  const [form, setForm] = useState({});
 
   console.log("Form state: ", form);
   useEffect(() => {

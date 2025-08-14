@@ -5,7 +5,7 @@ import Signup from "./components/Signup";
 import MyBids from "./components/MyBids.js";
 import MyProducts from "./components/MyProducts.js";
 import Profile from "./components/Profile.js";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { validateSession_call } from "./api_call.js";
 import Home from "./components/Home.js";
 import NotFound from "./components/not-found.js";

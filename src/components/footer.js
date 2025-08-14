@@ -16,14 +16,14 @@ export function Footer() {
             </p>
             <div className="flex space-x-4">
               <a
-                href="#"
+                href="https://www.instagram.com/punithashunmugam4/"
                 target="blank"
                 className="text-gray-400 hover:text-farm-green-500 transition-colors"
               >
                 Facebook
               </a>
               <a
-                href="#"
+                href="https://www.instagram.com/punithashunmugam4/"
                 target="blank"
                 className="text-gray-400 hover:text-farm-green-500 transition-colors"
               >
@@ -43,7 +43,7 @@ export function Footer() {
             <ul className="space-y-2 text-gray-400">
               <li>
                 <a
-                  href="#"
+                  href="https://www.instagram.com/punithashunmugam4/"
                   target="blank"
                   className="hover:text-white transition-colors"
                 >
@@ -52,7 +52,7 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="https://www.instagram.com/punithashunmugam4/"
                   target="blank"
                   className="hover:text-white transition-colors"
                 >
@@ -61,7 +61,7 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="https://www.instagram.com/punithashunmugam4/"
                   target="blank"
                   className="hover:text-white transition-colors"
                 >
@@ -70,7 +70,7 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="https://www.instagram.com/punithashunmugam4/"
                   target="blank"
                   className="hover:text-white transition-colors"
                 >
@@ -84,7 +84,7 @@ export function Footer() {
             <ul className="space-y-2 text-gray-400">
               <li>
                 <a
-                  href="#"
+                  href="https://www.instagram.com/punithashunmugam4/"
                   target="blank"
                   className="hover:text-white transition-colors"
                 >
@@ -93,7 +93,7 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="https://www.instagram.com/punithashunmugam4/"
                   target="blank"
                   className="hover:text-white transition-colors"
                 >
@@ -102,7 +102,7 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="https://www.instagram.com/punithashunmugam4/"
                   target="blank"
                   className="hover:text-white transition-colors"
                 >
@@ -111,7 +111,7 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="https://www.instagram.com/punithashunmugam4/"
                   target="blank"
                   className="hover:text-white transition-colors"
                 >
@@ -124,22 +124,34 @@ export function Footer() {
             <h4 className="text-lg font-semibold mb-4">Support</h4>
             <ul className="space-y-2 text-gray-400">
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <a
+                  href="https://www.instagram.com/punithashunmugam4/"
+                  className="hover:text-white transition-colors"
+                >
                   Help Center
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <a
+                  href="https://www.instagram.com/punithashunmugam4/"
+                  className="hover:text-white transition-colors"
+                >
                   Contact Us
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <a
+                  href="https://www.instagram.com/punithashunmugam4/"
+                  className="hover:text-white transition-colors"
+                >
                   Terms of Service
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <a
+                  href="https://www.instagram.com/punithashunmugam4/"
+                  className="hover:text-white transition-colors"
+                >
                   Privacy Policy
                 </a>
               </li>

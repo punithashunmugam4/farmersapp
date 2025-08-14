@@ -118,7 +118,14 @@ const MyProducts = ({
         setIsLoading(false);
       }
     })();
-  }, [isSessionValid, showFarmerModal, showAcceptModal, filters]);
+  }, [
+    isSessionValid,
+    showFarmerModal,
+    showAcceptModal,
+    filters,
+    setIsSessionValid,
+    setUser,
+  ]);
 
   const handleBidClick = (product, modal) => {
     setSelectedProduct(product);

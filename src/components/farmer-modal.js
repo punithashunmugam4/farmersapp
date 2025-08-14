@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
-  DialogTitle,
   Button,
   Input,
   Select,
@@ -87,8 +86,6 @@ export function FarmerModal({ user, isOpen, onClose, product }) {
       // console.log("Initial formData:", formData);
     }
   }, [user, isOpen]);
-
-  const now = new Date(Date.now());
 
   const handleSubmit = async (e) => {
     e.preventDefault();

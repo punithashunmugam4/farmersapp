@@ -1,4 +1,4 @@
-import { Clock, MapPin, Pencil } from "lucide-react";
+import { Clock, MapPin } from "lucide-react";
 import Badge from "@mui/material/Badge";
 
 export function MyBidsCard({ user, product, onBidClick }) {
