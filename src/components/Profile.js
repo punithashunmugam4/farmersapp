@@ -81,7 +81,7 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
         ...form,
         contract_users: Array.isArray(form.contract_users)
           ? form.contract_users
-          : form.contract_users.includes(",")
+          : form?.contract_users.includes(",")
           ? form.contract_users?.split(",")
           : null,
       };
