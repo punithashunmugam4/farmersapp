@@ -63,7 +63,7 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
         // }));
       }
     })();
-  }, [isSessionValid]);
+  }, [isSessionValid, setIsSessionValid, setUser, navigate]);
 
   const handleChange = (name, value) => {
     setForm((prev) => ({
@@ -79,10 +79,11 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
     if (form.contract_users) {
       updatedUser = {
         ...form,
-        contract_users:
-          typeof form.contract_users === "String"
-            ? form.contract_users?.split(",")
-            : form.contract_users,
+        contract_users: Array.isArray(form.contract_users)
+          ? form.contract_users
+          : form.contract_users.includes(",")
+          ? form.contract_users?.split(",")
+          : null,
       };
     }
     const token = sessionStorage.getItem("session_token_farmersapp");

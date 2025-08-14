@@ -8,12 +8,19 @@ const Signup = () => {
   const userRef = useRef(null);
   const [showPassword, setShowPassword] = useState(false);
   const [userDetails, setUserDetails] = useState(null);
+
   const createuser = async (e) => {
     e.preventDefault();
-    console.log(userDetails);
+
     try {
-      const response = await signup(process.env.REACT_APP_API_URL, userDetails);
-      console.log(response.status);
+      const token = await window.grecaptcha.execute(
+        process.env.REACT_APP_RECAPTCHA_V3_SITE_KEY,
+        { action: "signup" }
+      );
+
+      const payload = { ...userDetails, captchaToken: token };
+
+      const response = await signup(process.env.REACT_APP_API_URL, payload);
       if (response.status === 201) {
         alert("User created successfully!");
         window.location.href = "/login";
@@ -25,9 +32,6 @@ const Signup = () => {
       alert("An error occurred while creating the user.");
     }
   };
-  function submitAfterVerified() {
-    document.getElementById("signup-form").submit();
-  }
 
   const handleChange = (field, value) => {
     setUserDetails((prev) => ({ ...prev, [field]: value }));
@@ -224,14 +228,12 @@ const Signup = () => {
               </div>
               <div className="flex flex-col items-center gap-4 justify-between">
                 <button
-                  className="g-recaptcha earth-500 hover:earth-700 text-white w-40 h-10 shadow-xl flex rounded items-center justify-center text-xl"
-                  type="Submit"
-                  data-sitekey="6Ldpz6QrAAAAAC1jKgCEPsGA9fst7amElS7DraPb"
-                  data-callback="submitAfterVerified"
-                  data-action="submit"
+                  className="earth-500 hover:earth-700 text-white w-40 h-10 shadow-xl flex rounded items-center justify-center text-xl"
+                  type="submit"
                 >
                   Sign Up
                 </button>
+
                 <p style={{ marginLeft: "6px" }}>
                   Account already exist ? Click{" "}
                   <Link to="/login" style={{ color: "blue" }}>

@@ -68,6 +68,22 @@ const Home = ({
           process.env.REACT_APP_API_URL,
           sessionStorage.getItem("session_token_farmersapp")
         );
+        visibleLoads =
+          visibleLoads.length > 0
+            ? visibleLoads.filter((product) => {
+                let timeleft = getTimeLeft(
+                  product.auction_time_hrs,
+                  product.createdAt
+                );
+                if (
+                  timeleft === "Ended" ||
+                  product.status === "Closed" ||
+                  product.status === "Accepted"
+                ) {
+                  return true;
+                } else return false;
+              })
+            : [];
         if (visibleLoads.length > 0) {
           if (filters === null) {
             setProducts(visibleLoads);
@@ -117,22 +133,6 @@ const Home = ({
               return visibleLoads;
             });
           }
-
-          setProducts(
-            products.filter((product) => {
-              let timeleft = getTimeLeft(
-                product.auction_time_hrs,
-                product.createdAt
-              );
-              if (
-                timeleft === "Ended" ||
-                product.status === "Closed" ||
-                product.status === "Accepted"
-              ) {
-                return true;
-              } else return false;
-            })
-          );
         }
         setIsLoading(false);
       }
@@ -233,7 +233,7 @@ const Home = ({
                     product.status === "Closed" ||
                     product.status === "Accepted"
                   )
-                    return;
+                    return <></>;
                   else
                     return (
                       <ProductCard

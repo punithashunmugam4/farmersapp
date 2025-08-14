@@ -85,7 +85,7 @@ export function FarmerModal({ user, isOpen, onClose, product }) {
       // console.log("User details in FarmerModal:", user);
       // console.log("Initial formData:", formData);
     }
-  }, [user, isOpen]);
+  }, [user, isOpen, product]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
