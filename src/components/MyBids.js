@@ -4,14 +4,12 @@ import { MyBidsCard } from "./MyBidsCard.js";
 import { Footer } from "./footer.js";
 import SearchFilters from "./search-filters.js";
 import { useState, useEffect } from "react";
-
 import {
   get_my_user_details,
   get_my_bids,
   validateSession_call,
 } from "../api_call";
-
-const base_url = "http://localhost:3500/api/";
+require("dotenv").config();
 
 const MyBids = ({
   isSessionValid,
@@ -32,7 +30,7 @@ const MyBids = ({
       let token = sessionStorage.getItem("session_token_farmersapp");
       const validateSession_x = async () => {
         const token = sessionStorage.getItem("session_token_farmersapp");
-        let res = await validateSession_call(base_url, token);
+        let res = await validateSession_call(process.env.BASE_URL, token);
         if (res === false) {
           setUser(null);
           return false;
@@ -50,7 +48,10 @@ const MyBids = ({
         // navigate("/login");
       } else if (tempSession.username) {
         console.log("Get usedetails in Home.js");
-        let user_details = await get_my_user_details(base_url, token);
+        let user_details = await get_my_user_details(
+          process.env.BASE_URL,
+          token
+        );
         setUser(user_details);
         setIsSessionValid(true);
         setIsLoading(true);

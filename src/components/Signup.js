@@ -1,25 +1,19 @@
-import React, { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import bg from "../assets/background.jpg";
-import { Home } from "lucide-react";
+import { signup } from "../api_call";
+import Navigation from "./navigation.js";
+require("dotenv").config();
 
-function Signup() {
+const Signup = () => {
   const userRef = useRef(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [userDetails, setUserDetails] = useState(null);
   const createuser = async (e) => {
     e.preventDefault();
-    const base_url = "http://localhost:3500/api/";
-    const username = userRef.current.value;
-    const email = e.target[1].value;
-    const password = e.target[2].value;
+    console.log(userDetails);
     try {
-      const response = await fetch(`${base_url}user/signup`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, email, password }),
-      });
+      const response = await signup(process.env.BASE_URL, userDetails);
       console.log(response.status);
       if (response.status === 201) {
         alert("User created successfully!");
@@ -32,172 +26,227 @@ function Signup() {
       alert("An error occurred while creating the user.");
     }
   };
+  function submitAfterVerified() {
+    document.getElementById("signup-form").submit();
+  }
 
+  const handleChange = (field, value) => {
+    setUserDetails((prev) => ({ ...prev, [field]: value }));
+  };
   useEffect(() => {
     userRef.current && userRef.current.focus();
   }, []);
   return (
     <div
-      className="flex items-center justify-center min-h-screen "
       style={{
         backgroundImage: `url(${bg})`,
         backgroundSize: "cover",
       }}
     >
-      <div className="px-20 py-12 bg-white bg-opacity-80 rounded-lg shadow-md">
-        <Link to="/">
-          <Home />
-        </Link>
-        <h2 className="text-lg font-bold text-gray-700 mb-4">
-          Create your Account
-        </h2>
-        <form onSubmit={createuser}>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="name"
-            >
-              Name
-            </label>
-            <input
-              className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
+      <div className="min-h-screen ">
+        <Navigation />
+        <div className="flex justify-center">
+          <div className="px-12 py-12 w-fit my-12 rounded-lg shadow-md flex flex-col gap-2 justify-center items-center bg-white bg-opacity-60 ">
+            <h2 className="text-lg font-bold text-gray-700 mb-4">
+              Create your Account
+            </h2>
+            <form id="signup-form" onSubmit={createuser}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
+                <div>
+                  <div className="mb-4">
+                    <label
+                      className="block text-gray-700 text-sm font-bold mb-2"
+                      htmlFor="name"
+                    >
+                      Name
+                    </label>
+                    <input
+                      className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
    tight focus:outline-none focus:shadow-outline"
-              id="name"
-              placeholder="Full Name"
-              ref={userRef}
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="
+                      id="name"
+                      placeholder="Full Name"
+                      ref={userRef}
+                      onChange={(e) => handleChange("name", e.target.value)}
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      className="block text-gray-700 text-sm font-bold mb-2"
+                      htmlFor="
    email"
-            >
-              Email
-            </label>
-            <input
-              className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
+                    >
+                      Email
+                    </label>
+                    <input
+                      className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
    tight focus:outline-none focus:shadow-outline"
-              id="email"
-              placeholder="Email"
-              type="email"
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="
+                      id="email"
+                      placeholder="Email"
+                      type="email"
+                      onChange={(e) => handleChange("email", e.target.value)}
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      className="block text-gray-700 text-sm font-bold mb-2"
+                      htmlFor="
+   email"
+                    >
+                      Date of Birth
+                    </label>
+                    <input
+                      className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
+   tight focus:outline-none focus:shadow-outline"
+                      id="dob"
+                      type="date"
+                      onChange={(e) => handleChange("dob", e.target.value)}
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      className="block text-gray-700 text-l font-bold mb-2"
+                      htmlFor="contact"
+                    >
+                      Contact Number
+                    </label>
+                    <input
+                      className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
+   tight focus:outline-none focus:shadow-outline"
+                      id="contact"
+                      placeholder="Contact Number"
+                      onChange={(e) => handleChange("contact", e.target.value)}
+                    />
+                  </div>{" "}
+                  <div className="mb-6">
+                    <label
+                      className="block text-gray-700 text-sm font-bold mb-2"
+                      htmlFor="password"
+                    >
+                      Password
+                    </label>
+                    <input
+                      className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Password"
+                      onChange={(e) => handleChange("password", e.target.value)}
+                    />
+                  </div>
+                  <div className="mb-6">
+                    <input
+                      className="show-password-checkbox"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      type="checkbox"
+                      id="showPassword"
+                    />
+                    <label htmlFor="showPassword" style={{ marginLeft: "6px" }}>
+                      Show Password
+                    </label>
+                  </div>
+                </div>
+                <div>
+                  <div className="mb-4">
+                    <label
+                      className="block text-gray-700 text-sm font-bold mb-2"
+                      htmlFor="
    address"
-            >
-              ADDRESS
-            </label>
-            <input
-              className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
+                    >
+                      ADDRESS
+                    </label>
+                    <input
+                      className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
    tight focus:outline-none focus:shadow-outline"
-              id="address"
-              placeholder="ADDRESS"
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="city"
-            >
-              City
-            </label>
-            <input
-              className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
+                      id="address"
+                      placeholder="ADDRESS"
+                      onChange={(e) => handleChange("address", e.target.value)}
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      className="block text-gray-700 text-sm font-bold mb-2"
+                      htmlFor="city"
+                    >
+                      City
+                    </label>
+                    <input
+                      className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
    tight focus:outline-none focus:shadow-outline"
-              id="city"
-              placeholder="City"
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="state"
-            >
-              State
-            </label>
-            <input
-              className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
+                      id="city"
+                      placeholder="City"
+                      onChange={(e) => handleChange("city", e.target.value)}
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      className="block text-gray-700 text-sm font-bold mb-2"
+                      htmlFor="state"
+                    >
+                      State
+                    </label>
+                    <input
+                      className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
    tight focus:outline-none focus:shadow-outline"
-              id="state"
-              placeholder="State"
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-l font-bold mb-2"
-              htmlFor="country"
-            >
-              Country
-            </label>
-            <input
-              className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
+                      id="state"
+                      placeholder="State"
+                      onChange={(e) => handleChange("state", e.target.value)}
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      className="block text-gray-700 text-l font-bold mb-2"
+                      htmlFor="country"
+                    >
+                      Country
+                    </label>
+                    <input
+                      className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
    tight focus:outline-none focus:shadow-outline"
-              id="country"
-              placeholder="Country"
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-l font-bold mb-2"
-              htmlFor="contact"
-            >
-              Contact Number
-            </label>
-            <input
-              className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
+                      id="country"
+                      placeholder="Country"
+                      onChange={(e) => handleChange("country", e.target.value)}
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      className="block text-gray-700 text-l font-bold mb-2"
+                      htmlFor="zipcode"
+                    >
+                      Zip code
+                    </label>
+                    <input
+                      className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
    tight focus:outline-none focus:shadow-outline"
-              id="contact"
-              placeholder="Contact Number"
-            />
+                      id="zipcode"
+                      placeholder="Zip Code"
+                      onChange={(e) => handleChange("zipcode", e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col items-center gap-4 justify-between">
+                <button
+                  className="g-recaptcha earth-500 hover:earth-700 text-white w-40 h-10 shadow-xl flex rounded items-center justify-center text-xl"
+                  type="Submit"
+                  data-sitekey="6Ldpz6QrAAAAAC1jKgCEPsGA9fst7amElS7DraPb"
+                  data-callback="submitAfterVerified"
+                  data-action="submit"
+                >
+                  Sign Up
+                </button>
+                <p style={{ marginLeft: "6px" }}>
+                  Account already exist ? Click{" "}
+                  <Link to="/login" style={{ color: "blue" }}>
+                    here
+                  </Link>{" "}
+                  to sign in.
+                </p>
+              </div>
+            </form>
           </div>
-          <div className="mb-6">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="password"
-            >
-              Password
-            </label>
-            <input
-              className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-            />
-          </div>
-          <div className="mb-6">
-            <input
-              className="show-password-checkbox"
-              onClick={() => setShowPassword((prev) => !prev)}
-              type="checkbox"
-              id="showPassword"
-            />
-            <label htmlFor="showPassword" style={{ marginLeft: "6px" }}>
-              Show Password
-            </label>
-          </div>
-          <div className="flex items-center justify-between">
-            <button
-              className="earth-500 hover:earth-700 text-white w-20 h-10 shadow-xl flex rounded items-center justify-center text-xl"
-              type="Submit"
-            >
-              Sign Up
-            </button>
-            <p style={{ marginLeft: "6px" }}>
-              Account already exist ? Click{" "}
-              <Link to="/login" style={{ color: "blue" }}>
-                here
-              </Link>{" "}
-              to sign in.
-            </p>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
   );
-}
+};
 
 export default Signup;

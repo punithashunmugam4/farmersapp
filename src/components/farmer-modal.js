@@ -19,7 +19,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { add_new_load } from "../api_call";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { isCookie } from "react-router";
+require("dotenv").config();
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -123,7 +123,7 @@ export function FarmerModal({ user, isOpen, onClose, product }) {
     console.log("Load details to be sent:", loadDetails);
 
     add_new_load(
-      "http://localhost:3500/api/",
+      process.env.BASE_URL,
       sessionStorage.getItem("session_token_farmersapp"),
       loadDetails
     )

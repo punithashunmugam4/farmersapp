@@ -33,6 +33,27 @@ const login = async (base_url, username, password) => {
   }
 };
 
+const signup = async (base_url, user_details) => {
+  try {
+    const response = await fetch(`${base_url}user/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(user_details),
+    });
+    if (handleAuthError(response)) return;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return response;
+  } catch (error) {
+    console.error("Error updating user details:", error);
+    return error;
+  }
+};
+
 const get_all_loads = async (base_url, session_token) => {
   console.log("Fetching all loads... API call");
   try {
@@ -246,4 +267,5 @@ export {
   update_user_details,
   add_new_load,
   add_bid,
+  signup,
 };

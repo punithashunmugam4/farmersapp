@@ -1,8 +1,9 @@
-import React, { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { get_user_details, login } from "../api_call";
+import { login } from "../api_call";
 import bg from "../assets/background.jpg";
 import { Home } from "lucide-react";
+require("dotenv").config();
 
 const Login = ({
   isSessionValid,
@@ -11,7 +12,6 @@ const Login = ({
   setUser,
 }) => {
   const navigate = useNavigate();
-  const base_url = "http://localhost:3500/api/";
   const userRef = useRef(null);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -38,7 +38,7 @@ const Login = ({
     const username = userRef.current.value;
     const password = e.target[1].value;
 
-    const userdata = await login(base_url, username, password);
+    const userdata = await login(process.env.BASE_URL, username, password);
     if (userdata && userdata.token) {
       setUser(userdata.user);
       setIsSessionValid(true);

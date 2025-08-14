@@ -9,8 +9,7 @@ import bg from "../assets/background.jpg";
 import Navigation from "./navigation.js";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-const base_url = "http://localhost:3500/api/";
+require("dotenv").config();
 
 const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
   const navigate = useNavigate();
@@ -37,7 +36,7 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
       let token = sessionStorage.getItem("session_token_farmersapp");
       const validateSession_x = async () => {
         const token = sessionStorage.getItem("session_token_farmersapp");
-        let res = await validateSession_call(base_url, token);
+        let res = await validateSession_call(process.env.BASE_URL, token);
         if (res === false) {
           setUser(null);
           return false;
@@ -54,7 +53,10 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
         navigate("/login");
       } else if (tempSession.username) {
         console.log("Get usedetails in Home.js");
-        let user_details = await get_my_user_details(base_url, token);
+        let user_details = await get_my_user_details(
+          process.env.BASE_URL,
+          token
+        );
         setUser(user_details);
         setIsSessionValid(true);
         setForm(user_details);

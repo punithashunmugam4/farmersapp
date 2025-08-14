@@ -5,21 +5,21 @@ import Signup from "./components/Signup";
 import MyBids from "./components/MyBids.js";
 import MyProducts from "./components/MyProducts.js";
 import Profile from "./components/Profile.js";
-import React, { useState, useEffect } from "react";
-import { validateSession_call, get_my_user_details } from "./api_call.js";
+import { useState, useEffect } from "react";
+import { validateSession_call } from "./api_call.js";
 import Home from "./components/Home.js";
 import NotFound from "./components/not-found.js";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
+require("dotenv").config();
 
 const TooltipProvider = TooltipPrimitive.Provider;
-const base_url = "http://localhost:3500/api/";
 function App() {
   const [user, setUser] = useState(null);
   const [isSessionValid, setIsSessionValid] = useState(false);
 
   const validateSession = async () => {
     const token = sessionStorage.getItem("session_token_farmersapp");
-    let res = await validateSession_call(base_url, token);
+    let res = await validateSession_call(process.env.BASE_URL, token);
     if (res === false) {
       setUser(null);
       return false;

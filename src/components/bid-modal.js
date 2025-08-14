@@ -3,7 +3,7 @@ import { Dialog, DialogTitle, DialogContent, Button } from "@mui/material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { add_bid } from "../api_call";
-const base_url = "http://localhost:3500/api/";
+require("dotenv").config();
 const sleep = async (ms) =>
   await new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -35,7 +35,7 @@ export function BidModal({ user, product, isOpen, onClose }) {
       toast.error("Invalid Bid amount. Please enter a higher amount.");
     } else {
       let res = await add_bid(
-        base_url,
+        process.env.BASE_URL,
         sessionStorage.getItem("session_token_farmersapp"),
         { auction_id: product.auction_id, bid_amount: newBid }
       );

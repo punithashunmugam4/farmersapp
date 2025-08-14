@@ -11,6 +11,7 @@ import {
   get_my_loads,
   validateSession_call,
 } from "../api_call";
+require("dotenv").config();
 
 const base_url = "http://localhost:3500/api/";
 
@@ -34,7 +35,7 @@ const MyProducts = ({
       let token = sessionStorage.getItem("session_token_farmersapp");
       const validateSession_x = async () => {
         const token = sessionStorage.getItem("session_token_farmersapp");
-        let res = await validateSession_call(base_url, token);
+        let res = await validateSession_call(process.env.BASE_UR, token);
         if (res === false) {
           setUser(null);
           return false;
@@ -52,7 +53,10 @@ const MyProducts = ({
         // navigate("/login");
       } else if (tempSession.username) {
         console.log("Get usedetails in Home.js");
-        let user_details = await get_my_user_details(base_url, token);
+        let user_details = await get_my_user_details(
+          process.env.BASE_URL,
+          token
+        );
         setUser(user_details);
         setIsSessionValid(true);
         setIsLoading(true);
