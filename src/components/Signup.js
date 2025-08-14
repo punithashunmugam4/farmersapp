@@ -13,14 +13,14 @@ const Signup = () => {
     e.preventDefault();
 
     try {
-      const token = await window.grecaptcha.execute(
-        process.env.REACT_APP_RECAPTCHA_V3_SITE_KEY,
-        { action: "signup" }
-      );
+      // const token = await window.grecaptcha.execute(
+      //   process.env.REACT_APP_RECAPTCHA_V3_SITE_KEY,
+      //   { action: "signup" }
+      // );
 
-      const payload = { ...userDetails, captchaToken: token };
+      // const payload = { ...userDetails, captchaToken: token };
 
-      const response = await signup(process.env.REACT_APP_API_URL, payload);
+      const response = await signup(process.env.REACT_APP_API_URL, userDetails);
       if (response.status === 201) {
         alert("User created successfully!");
         window.location.href = "/login";
@@ -64,6 +64,7 @@ const Signup = () => {
                       Name
                     </label>
                     <input
+                      required
                       className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
    tight focus:outline-none focus:shadow-outline"
                       id="name"
@@ -81,6 +82,7 @@ const Signup = () => {
                       Email
                     </label>
                     <input
+                      required
                       className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
    tight focus:outline-none focus:shadow-outline"
                       id="email"
@@ -98,6 +100,7 @@ const Signup = () => {
                       Date of Birth
                     </label>
                     <input
+                      required
                       className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
    tight focus:outline-none focus:shadow-outline"
                       id="dob"
@@ -113,6 +116,7 @@ const Signup = () => {
                       Contact Number
                     </label>
                     <input
+                      required
                       className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
    tight focus:outline-none focus:shadow-outline"
                       id="contact"
@@ -128,6 +132,7 @@ const Signup = () => {
                       Password
                     </label>
                     <input
+                      required
                       className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                       id="password"
                       type={showPassword ? "text" : "password"}
@@ -157,6 +162,7 @@ const Signup = () => {
                       ADDRESS
                     </label>
                     <input
+                      required
                       className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
    tight focus:outline-none focus:shadow-outline"
                       id="address"
@@ -172,6 +178,7 @@ const Signup = () => {
                       City
                     </label>
                     <input
+                      required
                       className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
    tight focus:outline-none focus:shadow-outline"
                       id="city"
@@ -187,6 +194,7 @@ const Signup = () => {
                       State
                     </label>
                     <input
+                      required
                       className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
    tight focus:outline-none focus:shadow-outline"
                       id="state"
@@ -202,6 +210,7 @@ const Signup = () => {
                       Country
                     </label>
                     <input
+                      required
                       className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
    tight focus:outline-none focus:shadow-outline"
                       id="country"
@@ -217,6 +226,7 @@ const Signup = () => {
                       Zip code
                     </label>
                     <input
+                      required
                       className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
    tight focus:outline-none focus:shadow-outline"
                       id="zipcode"
