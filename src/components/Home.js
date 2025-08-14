@@ -80,8 +80,8 @@ const Home = ({
                   product.status === "Closed" ||
                   product.status === "Accepted"
                 ) {
-                  return true;
-                } else return false;
+                  return false;
+                } else return true;
               })
             : [];
         if (visibleLoads.length > 0) {

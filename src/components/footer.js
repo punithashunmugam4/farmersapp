@@ -127,14 +127,16 @@ export function Footer() {
                 <a
                   href="https://www.instagram.com/punithashunmugam4/"
                   className="hover:text-white transition-colors"
+                  target="blank"
                 >
                   Help Center
                 </a>
               </li>
               <li>
                 <a
-                  href="https://www.instagram.com/punithashunmugam4/"
+                  href="https://mail.google.com/mail/?view=cm&fs=1&to=punithashunmugam4@gmail.com"
                   className="hover:text-white transition-colors"
+                  target="blank"
                 >
                   Contact Us
                 </a>
@@ -143,6 +145,7 @@ export function Footer() {
                 <a
                   href="https://www.instagram.com/punithashunmugam4/"
                   className="hover:text-white transition-colors"
+                  target="blank"
                 >
                   Terms of Service
                 </a>
@@ -151,6 +154,7 @@ export function Footer() {
                 <a
                   href="https://www.instagram.com/punithashunmugam4/"
                   className="hover:text-white transition-colors"
+                  target="blank"
                 >
                   Privacy Policy
                 </a>

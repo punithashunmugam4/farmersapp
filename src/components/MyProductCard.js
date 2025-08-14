@@ -8,10 +8,14 @@ export function MyProductCard({ user, product, timeLeft, onBidClick }) {
     return "bg-green-100 text-green-800";
   };
 
-  const winner = product.all_bids.filter((bid) => {
-    if (bid.status === "Accepted" || bid.status === "Awarded") return true;
-    else return false;
-  });
+  const winner =
+    Array.isArray(product?.allbids) && product?.allbids.length > 0
+      ? product.all_bids.filter((bid) => {
+          if (bid.status === "Accepted" || bid.status === "Awarded")
+            return true;
+          else return false;
+        })
+      : [];
   console.log("Winner: ", winner);
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
@@ -102,9 +106,14 @@ export function MyProductCard({ user, product, timeLeft, onBidClick }) {
             </button>
           ) : (
             <p className="text-farm-green-600">
-              Winner is <span className="font-bold">{winner[0].name}</span> with
-              bid amount{" "}
-              <span className="font-bold ">Rs. {winner[0].submit_amount}</span>
+              Winner is{" "}
+              <span className="font-bold">
+                {winner.length > 0 ? winner[0].name : ""}
+              </span>{" "}
+              with bid amount{" "}
+              <span className="font-bold ">
+                Rs. {winner.length > 0 ? winner[0].submit_amount : 0}
+              </span>
             </p>
           )}
         </div>
