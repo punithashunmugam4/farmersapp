@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   get_my_user_details,
   update_user_details,
@@ -9,7 +9,6 @@ import bg from "../assets/background.jpg";
 import Navigation from "./navigation.js";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-require("dotenv").config();
 
 const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
   const navigate = useNavigate();
@@ -17,16 +16,16 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
   const userRef = useRef(null);
   console.log("Profile: ", user);
   const [form, setForm] = useState({
-    name: user?.name || "",
-    email: user?.email || "",
-    address: user?.address || "",
-    city: user?.city || "",
-    state: user?.state || "",
-    zipcode: user?.zipcode || "",
-    country: user?.country || "",
-    contact: user?.contact || "",
-    dob: user?.dob ? user.dob.slice(0, 10) : "",
-    contract_users: user?.contract_users || [],
+    // name: user?.name || "",
+    // email: user?.email || "",
+    // address: user?.address || "",
+    // city: user?.city || "",
+    // state: user?.state || "",
+    // zipcode: user?.zipcode || "",
+    // country: user?.country || "",
+    // contact: user?.contact || "",
+    // dob: user?.dob ? user.dob.slice(0, 10) : "",
+    // contract_users: user?.contract_users || [],
   });
 
   console.log("Form state: ", form);
@@ -36,7 +35,10 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
       let token = sessionStorage.getItem("session_token_farmersapp");
       const validateSession_x = async () => {
         const token = sessionStorage.getItem("session_token_farmersapp");
-        let res = await validateSession_call(process.env.BASE_URL, token);
+        let res = await validateSession_call(
+          process.env.REACT_APP_API_URL,
+          token
+        );
         if (res === false) {
           setUser(null);
           return false;
@@ -54,22 +56,22 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
       } else if (tempSession.username) {
         console.log("Get usedetails in Home.js");
         let user_details = await get_my_user_details(
-          process.env.BASE_URL,
+          process.env.REACT_APP_API_URL,
           token
         );
         setUser(user_details);
         setIsSessionValid(true);
-        setForm(user_details);
-        setForm((prev) => ({
-          ...prev,
-          dob: user_details?.dob ? user_details?.dob.slice(0, 10) : "",
-          password: "",
-          contract_users:
-            user_details?.contract_users &&
-            user_details?.contract_users.length > 0
-              ? user_details?.contract_users.join(",")
-              : "",
-        }));
+        // setForm(user_details);
+        // setForm((prev) => ({
+        //   ...prev,
+        //   dob: user_details?.dob ? user_details?.dob.slice(0, 10) : "",
+        //   password: "",
+        //   contract_users:
+        //     user_details?.contract_users &&
+        //     user_details?.contract_users.length > 0
+        //       ? user_details?.contract_users.join(",")
+        //       : "",
+        // }));
       }
     })();
   }, [isSessionValid]);
@@ -84,15 +86,22 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const updatedUser = {
-      ...form,
-      contract_users:
-        typeof form.contract_users === "String"
-          ? form.contract_users?.split(",")
-          : form.contract_users,
-    };
+    var updatedUser = form;
+    if (form.contract_users) {
+      updatedUser = {
+        ...form,
+        contract_users:
+          typeof form.contract_users === "String"
+            ? form.contract_users?.split(",")
+            : form.contract_users,
+      };
+    }
     const token = sessionStorage.getItem("session_token_farmersapp");
-    let response = await update_user_details(base_url, token, updatedUser);
+    let response = await update_user_details(
+      process.env.REACT_APP_API_URL,
+      token,
+      updatedUser
+    );
     if (response.status === 201 || response.status === 200) {
       toast.success("🚀 Profile details updated successfully!");
       //  navigate("/");
@@ -131,7 +140,7 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
                 id="name"
                 placeholder="Full Name"
                 ref={userRef}
-                value={form?.name}
+                value={user?.name || ""}
                 onChange={(e) => handleChange("name", e.target.value)}
               />
             </div>
@@ -149,7 +158,7 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
                 id="email"
                 placeholder="Email"
                 type="email"
-                value={form?.email}
+                value={user?.email || ""}
                 onChange={(e) => handleChange("email", e.target.value)}
               />
             </div>
@@ -166,7 +175,7 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
    tight focus:outline-none focus:shadow-outline"
                 id="address"
                 placeholder="ADDRESS"
-                value={form?.address}
+                value={user?.address || ""}
                 onChange={(e) => handleChange("address", e.target.value)}
               />
             </div>
@@ -182,7 +191,7 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
    tight focus:outline-none focus:shadow-outline"
                 id="city"
                 placeholder="City"
-                value={form?.city}
+                value={user?.city || ""}
                 onChange={(e) => handleChange("city", e.target.value)}
               />
             </div>
@@ -198,7 +207,7 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
    tight focus:outline-none focus:shadow-outline"
                 id="state"
                 placeholder="State"
-                value={form?.state}
+                value={user?.state || ""}
                 onChange={(e) => handleChange("state", e.target.value)}
               />
             </div>
@@ -214,7 +223,7 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
    tight focus:outline-none focus:shadow-outline"
                 id="country"
                 placeholder="Country"
-                value={form?.country}
+                value={user?.country || ""}
                 onChange={(e) => handleChange("country", e.target.value)}
               />
             </div>
@@ -230,7 +239,7 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
    tight focus:outline-none focus:shadow-outline"
                 id="zipcode"
                 placeholder="zipcode"
-                value={form?.zipcode}
+                value={user?.zipcode || ""}
                 onChange={(e) => handleChange("zipcode", e.target.value)}
               />
             </div>
@@ -246,7 +255,7 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
    tight focus:outline-none focus:shadow-outline"
                 id="contact"
                 placeholder="Contact Number"
-                value={form?.contact}
+                value={user?.contact || ""}
                 onChange={(e) => handleChange("contact", e.target.value)}
               />
             </div>
@@ -262,7 +271,7 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
    tight focus:outline-none focus:shadow-outline"
                 id="contract_users"
                 placeholder="Contract users if available (comma separated value)"
-                value={form?.contract_users}
+                value={user?.contract_users || ""}
                 onChange={(e) => handleChange("contract_users", e.target.value)}
               />
             </div>

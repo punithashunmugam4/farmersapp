@@ -8,12 +8,14 @@ export function ProductCard({ user, product, timeLeft, onBidClick }) {
     return "bg-green-100 text-green-800";
   };
 
-  let current_bid = product.all_bids.filter((a) => {
-    if (user && a.name === user.username) {
-      return true;
-    }
-    return false;
-  });
+  let current_bid = Array.isArray(product?.all_bids)
+    ? product.all_bids.filter((a) => {
+        if (user && a.name === user.username) {
+          return true;
+        }
+        return false;
+      })
+    : 0;
 
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
@@ -41,8 +43,8 @@ export function ProductCard({ user, product, timeLeft, onBidClick }) {
         </div>
       </div>
 
-      <div className="p-5">
-        <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
+      <div className="p-5 ">
+        <div className="flex items-center justify-between text-sm text-gray-500">
           <h3 className="font-semibold first-letter-caps  text-lg text-gray-900 mb-2">
             {product.name}
           </h3>
@@ -50,13 +52,13 @@ export function ProductCard({ user, product, timeLeft, onBidClick }) {
             {product.product} - {product.weight} kg
           </p>
         </div>
-        <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
+        <div className="h-14 text-sm text-gray-500 mb-3">
           <span className="flex items-center">
             <MapPin className="w-3 h-3 mr-1" />
-            {product.product_location[0]?.address}, ,
+            {product.product_location[0]?.address},{" "}
             {product.product_location[0]?.city},{" "}
             {product.product_location[0]?.state},{" "}
-            {product.product_location[0]?.country}, ,
+            {product.product_location[0]?.country},{" "}
             {product.product_location[0]?.zip}
           </span>
         </div>
@@ -86,13 +88,15 @@ export function ProductCard({ user, product, timeLeft, onBidClick }) {
             <div className="text-right">
               <p className="text-xs text-gray-500">Total Bids</p>
               <p className="text-lg font-semibold text-gray-900">
-                {product.all_bids.length}
+                {Array.isArray(product?.all_bids)
+                  ? product?.all_bids.length
+                  : 0}
               </p>
             </div>
           </div>
           <button
             onClick={onBidClick}
-            className="w-full p-2  farm-green-600 hover:farm-green-700 text-white"
+            className="w-full p-2 farm-green-600 hover:farm-green-700 text-white"
           >
             Place Bid
           </button>

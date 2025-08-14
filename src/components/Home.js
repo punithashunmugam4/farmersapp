@@ -14,7 +14,7 @@ import {
   get_my_user_details,
   validateSession_call,
 } from "../api_call.js";
-require("dotenv").config();
+
 const Home = ({
   isSessionValid,
   setIsSessionValid,
@@ -36,7 +36,10 @@ const Home = ({
       let token = sessionStorage.getItem("session_token_farmersapp");
       const validateSession_x = async () => {
         const token = sessionStorage.getItem("session_token_farmersapp");
-        let res = await validateSession_call(process.env.BASE_URL, token);
+        let res = await validateSession_call(
+          process.env.REACT_APP_API_URL,
+          token
+        );
         if (res === false) {
           setUser(null);
           return false;
@@ -55,7 +58,7 @@ const Home = ({
       } else if (tempSession.username) {
         console.log("Get usedetails in Home.js");
         let user_details = await get_my_user_details(
-          process.env.BASE_URL,
+          process.env.REACT_APP_API_URL,
           token
         );
         setUser(user_details);
@@ -63,59 +66,75 @@ const Home = ({
         setIsLoading(true);
         console.log("Fetching products in Home.js");
         let visibleLoads = await get_all_loads(
-          base_url,
+          process.env.REACT_APP_API_URL,
           sessionStorage.getItem("session_token_farmersapp")
         );
+        if (visibleLoads.length > 0) {
+          if (filters === null) {
+            setProducts(visibleLoads);
+          } else {
+            console.log("Filter:: ", filters);
+            setProducts(() => {
+              visibleLoads = visibleLoads.filter((product) => {
+                if (
+                  filters.category === "" ||
+                  product.category.toLowerCase() ===
+                    filters.category.toLowerCase()
+                ) {
+                  console.log("Category match: ", product.category);
+                  return true;
+                } else return false;
+              });
 
-        if (filters === null) {
-          setProducts(visibleLoads);
-        } else {
-          console.log("Filter:: ", filters);
-          setProducts(() => {
-            visibleLoads = visibleLoads.filter((product) => {
-              if (
-                filters.category === "" ||
-                product.category.toLowerCase() ===
-                  filters.category.toLowerCase()
-              ) {
-                console.log("Category match: ", product.category);
-                return true;
-              } else return false;
+              visibleLoads = visibleLoads.filter((product) => {
+                if (
+                  filters.location === "" ||
+                  JSON.stringify(product.product_location)
+                    .toLowerCase()
+                    .includes(filters.location.toLowerCase())
+                ) {
+                  console.log("Location match: ", product.product_location);
+                  return true;
+                } else return false;
+              });
+              visibleLoads = visibleLoads.filter((product) => {
+                if (
+                  filters.search === "" ||
+                  product?.auction_id.toString().includes(filters.search) ||
+                  product?.product
+                    .toLowerCase()
+                    .includes(filters.search.toLowerCase()) ||
+                  product?.name
+                    .toLowerCase()
+                    .includes(filters.search.toLowerCase()) ||
+                  JSON.stringify(product.product_location).includes(
+                    filters.search
+                  )
+                ) {
+                  console.log("Search found: ", product);
+                  return true;
+                } else return false;
+              });
+              return visibleLoads;
             });
+          }
 
-            visibleLoads = visibleLoads.filter((product) => {
+          setProducts(
+            products.filter((product) => {
+              let timeleft = getTimeLeft(
+                product.auction_time_hrs,
+                product.createdAt
+              );
               if (
-                filters.location === "" ||
-                JSON.stringify(product.product_location)
-                  .toLowerCase()
-                  .includes(filters.location.toLowerCase())
+                timeleft === "Ended" ||
+                product.status === "Closed" ||
+                product.status === "Accepted"
               ) {
-                console.log("Location match: ", product.product_location);
                 return true;
               } else return false;
-            });
-            visibleLoads = visibleLoads.filter((product) => {
-              if (
-                filters.search === "" ||
-                product?.auction_id.toString().includes(filters.search) ||
-                product?.product
-                  .toLowerCase()
-                  .includes(filters.search.toLowerCase()) ||
-                product?.name
-                  .toLowerCase()
-                  .includes(filters.search.toLowerCase()) ||
-                JSON.stringify(product.product_location).includes(
-                  filters.search
-                )
-              ) {
-                console.log("Search found: ", product);
-                return true;
-              } else return false;
-            });
-            return visibleLoads;
-          });
+            })
+          );
         }
-
         setIsLoading(false);
       }
     })();
@@ -200,9 +219,8 @@ const Home = ({
               {products.length > 0 &&
                 products.map((product) => {
                   let timeleft = getTimeLeft(
-                    4,
-                    "2025-08-12T20:11:23.000Z" // product.auction_time_hrs,
-                    //  product.createdAt
+                    product.auction_time_hrs,
+                    product.createdAt
                   );
                   if (
                     timeleft === "Ended" ||
@@ -227,7 +245,9 @@ const Home = ({
           {products.length === 0 && !isLoading && (
             <div className="text-center py-12">
               <p className="text-gray-500 text-lg">
-                Login to view products and place bids.
+                {isSessionValid
+                  ? "No products found."
+                  : "Login to view products and place bids."}
               </p>
             </div>
           )}

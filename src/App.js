@@ -10,7 +10,6 @@ import { validateSession_call } from "./api_call.js";
 import Home from "./components/Home.js";
 import NotFound from "./components/not-found.js";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
-require("dotenv").config();
 
 const TooltipProvider = TooltipPrimitive.Provider;
 function App() {
@@ -19,7 +18,7 @@ function App() {
 
   const validateSession = async () => {
     const token = sessionStorage.getItem("session_token_farmersapp");
-    let res = await validateSession_call(process.env.BASE_URL, token);
+    let res = await validateSession_call(process.env.REACT_APP_API_URL, token);
     if (res === false) {
       setUser(null);
       return false;

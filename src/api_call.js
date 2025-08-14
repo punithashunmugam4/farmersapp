@@ -9,7 +9,7 @@ const handleAuthError = (response) => {
 
 const login = async (base_url, username, password) => {
   try {
-    const response = await fetch(`${base_url}user/login`, {
+    const response = await fetch(`${base_url}/api/user/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -35,7 +35,7 @@ const login = async (base_url, username, password) => {
 
 const signup = async (base_url, user_details) => {
   try {
-    const response = await fetch(`${base_url}user/signup`, {
+    const response = await fetch(`${base_url}/api/user/signup`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -57,7 +57,7 @@ const signup = async (base_url, user_details) => {
 const get_all_loads = async (base_url, session_token) => {
   console.log("Fetching all loads... API call");
   try {
-    const response = await fetch(`${base_url}data/getvisibleloads`, {
+    const response = await fetch(`${base_url}/api/data/getvisibleloads`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -79,7 +79,7 @@ const get_all_loads = async (base_url, session_token) => {
 const get_my_loads = async (base_url, session_token) => {
   console.log("Fetching all loads... API call");
   try {
-    const response = await fetch(`${base_url}data/getmyproducts`, {
+    const response = await fetch(`${base_url}/api/data/getmyproducts`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -101,7 +101,7 @@ const get_my_loads = async (base_url, session_token) => {
 const get_my_bids = async (base_url, session_token) => {
   console.log("Fetching all loads... API call");
   try {
-    const response = await fetch(`${base_url}data/getmybids`, {
+    const response = await fetch(`${base_url}/api/data/getmybids`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -123,7 +123,7 @@ const get_my_bids = async (base_url, session_token) => {
 const get_user_details = async (base_url, session_token, req_user) => {
   try {
     const response = await fetch(
-      `${base_url}user/getuserdetails/?username=${req_user}`,
+      `${base_url}/api/user/getuserdetails/?username=${req_user}`,
       {
         method: "POST",
         headers: {
@@ -147,7 +147,7 @@ const get_user_details = async (base_url, session_token, req_user) => {
 const get_my_user_details = async (base_url, session_token) => {
   console.log("Fetching my user details with token");
   try {
-    const response = await fetch(`${base_url}user/getuserdetails`, {
+    const response = await fetch(`${base_url}/api/user/getuserdetails`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -169,14 +169,14 @@ const get_my_user_details = async (base_url, session_token) => {
 const validateSession_call = async (base_url, session_token) => {
   console.log("Validating session with token");
   try {
-    const response = await fetch(`${base_url}user/validate`, {
+    const response = await fetch(`${base_url}/api/user/validate`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${session_token}`,
       },
     });
-    if (handleAuthError(response)) return false;
+    // if (handleAuthError(response)) return false;
     if (response.status !== 200) {
       console.log("Session expired or invalid: ", response.status);
       return false;
@@ -192,7 +192,7 @@ const validateSession_call = async (base_url, session_token) => {
 
 const update_user_details = async (base_url, session_token, user_details) => {
   try {
-    const response = await fetch(`${base_url}user/update`, {
+    const response = await fetch(`${base_url}/api/user/update`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -214,7 +214,7 @@ const update_user_details = async (base_url, session_token, user_details) => {
 
 const add_new_load = async (base_url, session_token, load_details) => {
   try {
-    const response = await fetch(`${base_url}data/addload`, {
+    const response = await fetch(`${base_url}/api/data/addload`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -236,7 +236,7 @@ const add_new_load = async (base_url, session_token, load_details) => {
 
 const add_bid = async (base_url, session_token, bid_details) => {
   try {
-    const response = await fetch(`${base_url}data/addbids`, {
+    const response = await fetch(`${base_url}/api/data/addbids`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",

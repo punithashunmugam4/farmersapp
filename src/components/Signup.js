@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import bg from "../assets/background.jpg";
 import { signup } from "../api_call";
 import Navigation from "./navigation.js";
-require("dotenv").config();
 
 const Signup = () => {
   const userRef = useRef(null);
@@ -13,7 +12,7 @@ const Signup = () => {
     e.preventDefault();
     console.log(userDetails);
     try {
-      const response = await signup(process.env.BASE_URL, userDetails);
+      const response = await signup(process.env.REACT_APP_API_URL, userDetails);
       console.log(response.status);
       if (response.status === 201) {
         alert("User created successfully!");

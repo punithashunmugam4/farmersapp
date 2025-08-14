@@ -3,7 +3,7 @@ import { Dialog, DialogTitle, DialogContent, Button } from "@mui/material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { add_new_load } from "../api_call";
-require("dotenv").config();
+
 const update_bid_status = add_new_load;
 const sleep = async (ms) =>
   await new Promise((resolve) => setTimeout(resolve, ms));
@@ -41,7 +41,7 @@ export function AcceptModal({ user, product, isOpen, onClose }) {
       });
       console.log(updated_all_bids);
       let res = await update_bid_status(
-        process.env.BASE_URL,
+         process.env.REACT_APP_API_URL,
         sessionStorage.getItem("session_token_farmersapp"),
         {
           auction_id: product.auction_id,

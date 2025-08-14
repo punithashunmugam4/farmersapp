@@ -9,7 +9,6 @@ import {
   get_my_bids,
   validateSession_call,
 } from "../api_call";
-require("dotenv").config();
 
 const MyBids = ({
   isSessionValid,
@@ -30,7 +29,10 @@ const MyBids = ({
       let token = sessionStorage.getItem("session_token_farmersapp");
       const validateSession_x = async () => {
         const token = sessionStorage.getItem("session_token_farmersapp");
-        let res = await validateSession_call(process.env.BASE_URL, token);
+        let res = await validateSession_call(
+          process.env.REACT_APP_API_URL,
+          token
+        );
         if (res === false) {
           setUser(null);
           return false;
@@ -49,7 +51,7 @@ const MyBids = ({
       } else if (tempSession.username) {
         console.log("Get usedetails in Home.js");
         let user_details = await get_my_user_details(
-          process.env.BASE_URL,
+          process.env.REACT_APP_API_URL,
           token
         );
         setUser(user_details);
@@ -57,59 +59,60 @@ const MyBids = ({
         setIsLoading(true);
         console.log("Fetching products in Home.js");
         let myLoads = await get_my_bids(
-          base_url,
+          process.env.REACT_APP_API_URL,
           sessionStorage.getItem("session_token_farmersapp")
         );
+        console.log("Loads got from api call: ", myLoads);
+        if (myLoads.length > 0) {
+          if (filters === null) {
+            setProducts(myLoads);
+          } else {
+            console.log("Filter:: ", filters);
+            setProducts(() => {
+              myLoads = myLoads.filter((product) => {
+                if (
+                  filters.category === "" ||
+                  product.category.toLowerCase() ===
+                    filters.category.toLowerCase()
+                ) {
+                  console.log("Category match: ", product.category);
+                  return true;
+                } else return false;
+              });
 
-        if (filters === null) {
-          setProducts(myLoads);
-        } else {
-          console.log("Filter:: ", filters);
-          setProducts(() => {
-            myLoads = myLoads.filter((product) => {
-              if (
-                filters.category === "" ||
-                product.category.toLowerCase() ===
-                  filters.category.toLowerCase()
-              ) {
-                console.log("Category match: ", product.category);
-                return true;
-              } else return false;
+              myLoads = myLoads.filter((product) => {
+                if (
+                  filters.location === "" ||
+                  JSON.stringify(product.product_location)
+                    .toLowerCase()
+                    .includes(filters.location.toLowerCase())
+                ) {
+                  console.log("Location match: ", product.product_location);
+                  return true;
+                } else return false;
+              });
+              myLoads = myLoads.filter((product) => {
+                if (
+                  filters.search === "" ||
+                  product?.auction_id.toString().includes(filters.search) ||
+                  product?.product
+                    .toLowerCase()
+                    .includes(filters.search.toLowerCase()) ||
+                  product?.name
+                    .toLowerCase()
+                    .includes(filters.search.toLowerCase()) ||
+                  JSON.stringify(product.product_location).includes(
+                    filters.search
+                  )
+                ) {
+                  console.log("Search found: ", product);
+                  return true;
+                } else return false;
+              });
+              return myLoads;
             });
-
-            myLoads = myLoads.filter((product) => {
-              if (
-                filters.location === "" ||
-                JSON.stringify(product.product_location)
-                  .toLowerCase()
-                  .includes(filters.location.toLowerCase())
-              ) {
-                console.log("Location match: ", product.product_location);
-                return true;
-              } else return false;
-            });
-            myLoads = myLoads.filter((product) => {
-              if (
-                filters.search === "" ||
-                product?.auction_id.toString().includes(filters.search) ||
-                product?.product
-                  .toLowerCase()
-                  .includes(filters.search.toLowerCase()) ||
-                product?.name
-                  .toLowerCase()
-                  .includes(filters.search.toLowerCase()) ||
-                JSON.stringify(product.product_location).includes(
-                  filters.search
-                )
-              ) {
-                console.log("Search found: ", product);
-                return true;
-              } else return false;
-            });
-            return myLoads;
-          });
+          }
         }
-
         setIsLoading(false);
       }
     })();
@@ -173,9 +176,7 @@ const MyBids = ({
 
           {products.length === 0 && !isLoading && (
             <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">
-                Login to view products and place bids.
-              </p>
+              <p className="text-gray-500 text-lg">No Bids Placed</p>
             </div>
           )}
         </div>

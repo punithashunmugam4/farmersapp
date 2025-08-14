@@ -3,7 +3,6 @@ import { useNavigate, Link } from "react-router-dom";
 import { login } from "../api_call";
 import bg from "../assets/background.jpg";
 import { Home } from "lucide-react";
-require("dotenv").config();
 
 const Login = ({
   isSessionValid,
@@ -38,7 +37,11 @@ const Login = ({
     const username = userRef.current.value;
     const password = e.target[1].value;
 
-    const userdata = await login(process.env.BASE_URL, username, password);
+    const userdata = await login(
+      process.env.REACT_APP_API_URL,
+      username,
+      password
+    );
     if (userdata && userdata.token) {
       setUser(userdata.user);
       setIsSessionValid(true);
