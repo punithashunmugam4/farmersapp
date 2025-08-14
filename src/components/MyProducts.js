@@ -203,9 +203,8 @@ const MyProducts = ({
               {products.length > 0 &&
                 products.map((product) => {
                   let timeleft = getTimeLeft(
-                    4,
-                    "2025-08-12T20:11:23.000Z" // product.auction_time_hrs,
-                    //  product.createdAt
+                    product.auction_time_hrs,
+                    product.createdAt
                   );
                   if (
                     product.status === "Closed" ||

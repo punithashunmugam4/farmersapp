@@ -1,21 +1,27 @@
 import { Clock, MapPin, Pencil } from "lucide-react";
 import Badge from "@mui/material/Badge";
+import { useEffect, useState } from "react";
 
 export function MyProductCard({ user, product, timeLeft, onBidClick }) {
+  const [winner, setWinner] = useState([]);
   const getTimeLeftColor = (timeLeft) => {
     if (timeLeft.includes("m")) return "bg-red-100 text-red-800";
     if (timeLeft.includes("h")) return "bg-yellow-100 text-yellow-800";
     return "bg-green-100 text-green-800";
   };
-
-  const winner =
-    Array.isArray(product?.allbids) && product?.allbids.length > 0
-      ? product.all_bids.filter((bid) => {
+  useEffect(() => {
+    setWinner(() => {
+      if (Array.isArray(product?.all_bids) && product?.all_bids.length > 0) {
+        return product?.all_bids.filter((bid) => {
+          console.log("Bid status: ", bid.status);
           if (bid.status === "Accepted" || bid.status === "Awarded")
             return true;
           else return false;
-        })
-      : [];
+        });
+      } else return [];
+    });
+  }, [product]);
+
   console.log("Winner: ", winner);
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
@@ -93,7 +99,9 @@ export function MyProductCard({ user, product, timeLeft, onBidClick }) {
             <div className="text-right">
               <p className="text-xs text-gray-500">Total Bids</p>
               <p className="text-lg font-semibold text-gray-900">
-                {product.all_bids.length}
+                {Array.isArray(product?.all_bids)
+                  ? product?.all_bids.length
+                  : 0}
               </p>
             </div>
           </div>

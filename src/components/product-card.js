@@ -94,12 +94,25 @@ export function ProductCard({ user, product, timeLeft, onBidClick }) {
               </p>
             </div>
           </div>
-          <button
-            onClick={onBidClick}
-            className="w-full p-2 farm-green-600 hover:farm-green-700 text-white"
-          >
-            Place Bid
-          </button>
+          {(current_bid[0] && current_bid[0]?.status === "Accepted") ||
+          current_bid[0]?.status === "Rejected" ? (
+            <p
+              className={`font-bold pt-3 text-xl text-center ${
+                current_bid[0].status === "Rejected"
+                  ? "text-red-800"
+                  : "text-farm-green-600"
+              }`}
+            >
+              {current_bid[0].status}
+            </p>
+          ) : (
+            <button
+              onClick={onBidClick}
+              className="w-full p-2 farm-green-600 hover:farm-green-700 text-white"
+            >
+              Place Bid
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -11,13 +11,15 @@ export function BidModal({ user, product, isOpen, onClose }) {
   const inputRef = useRef(null);
 
   if (!product) return null;
-  let current_bid = product.all_bids.filter((a) => {
-    console.log(a.name, user.username);
-    if (a.name === user.username) {
-      return true;
-    }
-    return false;
-  });
+  let current_bid = Array.isArray(product?.all_bids)
+    ? product?.all_bids.filter((a) => {
+        console.log(a.name, user.username);
+        if (a.name === user.username) {
+          return true;
+        }
+        return false;
+      })
+    : [];
 
   const minBid = (
     (product?.max_bid?.submit_amount

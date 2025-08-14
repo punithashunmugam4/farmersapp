@@ -193,7 +193,7 @@ const validateSession_call = async (base_url, session_token) => {
 const update_user_details = async (base_url, session_token, user_details) => {
   try {
     const response = await fetch(`${base_url}/api/user/update`, {
-      method: "POST",
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${session_token}`,

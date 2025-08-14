@@ -13,7 +13,7 @@ export function AcceptModal({ user, product, isOpen, onClose }) {
   const [isaccepted, setIsAccepted] = useState(false);
   useEffect(() => {
     setIsAccepted(
-      product?.all_bids.length > 0
+      Array.isArray(product?.all_bids) && product?.all_bids.length > 0
         ? product?.all_bids.some((bid) => {
             if (bid.status === "Accepted") {
               return true;
@@ -89,7 +89,9 @@ export function AcceptModal({ user, product, isOpen, onClose }) {
           </div>
 
           <div className=" grid grid-rows  gap-4  bg-gray-50 rounded-lg p-4 mb-4 ">
-            {product.all_bids.length > 0 && product.status !== "Accepted" ? (
+            {Array.isArray(product?.all_bids) &&
+            product?.all_bids.length > 0 &&
+            product.status !== "Accepted" ? (
               product.all_bids.map((bid) => (
                 <div className="grid grid-cols-4 gap-4  text-sm">
                   <div>

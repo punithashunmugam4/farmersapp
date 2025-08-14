@@ -50,17 +50,6 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
         );
         setUser(user_details);
         setIsSessionValid(true);
-        // setForm(user_details);
-        // setForm((prev) => ({
-        //   ...prev,
-        //   dob: user_details?.dob ? user_details?.dob.slice(0, 10) : "",
-        //   password: "",
-        //   contract_users:
-        //     user_details?.contract_users &&
-        //     user_details?.contract_users.length > 0
-        //       ? user_details?.contract_users.join(",")
-        //       : "",
-        // }));
       }
     })();
   }, [isSessionValid, setIsSessionValid, setUser, navigate]);
@@ -83,7 +72,7 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
           ? form.contract_users
           : form?.contract_users.includes(",")
           ? form.contract_users?.split(",")
-          : null,
+          : [form.contract_users],
       };
     }
     const token = sessionStorage.getItem("session_token_farmersapp");
@@ -111,6 +100,7 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
         <Navigation
           isSessionValid={isSessionValid}
           setIsSessionValid={setIsSessionValid}
+          user={user}
         />
         <div className="px-20 py-12 rounded-lg shadow-md flex flex-col justify-center items-center bg-white bg-opacity-60">
           <h2 className="text-lg font-bold text-gray-700 mb-4 text-center">
@@ -130,7 +120,7 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
                 id="name"
                 placeholder="Full Name"
                 ref={userRef}
-                value={user?.name || ""}
+                value={form?.name !== undefined ? form?.name : user?.name || ""}
                 onChange={(e) => handleChange("name", e.target.value)}
               />
             </div>
@@ -148,7 +138,9 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
                 id="email"
                 placeholder="Email"
                 type="email"
-                value={user?.email || ""}
+                value={
+                  form?.email !== undefined ? form?.email : user?.email || ""
+                }
                 onChange={(e) => handleChange("email", e.target.value)}
               />
             </div>
@@ -165,7 +157,11 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
    tight focus:outline-none focus:shadow-outline"
                 id="address"
                 placeholder="ADDRESS"
-                value={user?.address || ""}
+                value={
+                  form?.address !== undefined
+                    ? form?.address
+                    : user?.address || ""
+                }
                 onChange={(e) => handleChange("address", e.target.value)}
               />
             </div>
@@ -181,7 +177,7 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
    tight focus:outline-none focus:shadow-outline"
                 id="city"
                 placeholder="City"
-                value={user?.city || ""}
+                value={form?.city !== undefined ? form?.city : user?.city || ""}
                 onChange={(e) => handleChange("city", e.target.value)}
               />
             </div>
@@ -197,7 +193,9 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
    tight focus:outline-none focus:shadow-outline"
                 id="state"
                 placeholder="State"
-                value={user?.state || ""}
+                value={
+                  form?.state !== undefined ? form?.state : user?.state || ""
+                }
                 onChange={(e) => handleChange("state", e.target.value)}
               />
             </div>
@@ -213,7 +211,11 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
    tight focus:outline-none focus:shadow-outline"
                 id="country"
                 placeholder="Country"
-                value={user?.country || ""}
+                value={
+                  form?.country !== undefined
+                    ? form?.country
+                    : user?.country || ""
+                }
                 onChange={(e) => handleChange("country", e.target.value)}
               />
             </div>
@@ -229,7 +231,11 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
    tight focus:outline-none focus:shadow-outline"
                 id="zipcode"
                 placeholder="zipcode"
-                value={user?.zipcode || ""}
+                value={
+                  form?.zipcode !== undefined
+                    ? form?.zipcode
+                    : user?.zipcode || ""
+                }
                 onChange={(e) => handleChange("zipcode", e.target.value)}
               />
             </div>
@@ -245,7 +251,11 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
    tight focus:outline-none focus:shadow-outline"
                 id="contact"
                 placeholder="Contact Number"
-                value={user?.contact || ""}
+                value={
+                  form?.contact !== undefined
+                    ? form?.contact
+                    : user?.contact || ""
+                }
                 onChange={(e) => handleChange("contact", e.target.value)}
               />
             </div>
@@ -261,7 +271,11 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
    tight focus:outline-none focus:shadow-outline"
                 id="contract_users"
                 placeholder="Contract users if available (comma separated value)"
-                value={user?.contract_users || ""}
+                value={
+                  form?.contract_users !== undefined
+                    ? form?.contract_users
+                    : user?.contract_users || ""
+                }
                 onChange={(e) => handleChange("contract_users", e.target.value)}
               />
             </div>
