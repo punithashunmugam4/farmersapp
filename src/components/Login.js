@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { login } from "../api_call";
 import bg from "../assets/background.jpg";
-import { Home } from "lucide-react";
+import { HousePlus } from "lucide-react";
 
 const Login = ({
   isSessionValid,
@@ -22,15 +22,6 @@ const Login = ({
       navigate("/");
     }
   }, [isSessionValid, navigate]);
-
-  // (async () => {
-  //   if (sessionStorage.getItem("session_token_farmersapp") !== null) {
-  //     let session_valid = await validateSession();
-  //     if (session_valid) {
-  //       navigate("/"); // Redirect to home page if session is valid
-  //     }
-  //   }
-  // })();
 
   const createSession = async (e) => {
     e.preventDefault();
@@ -60,7 +51,7 @@ const Login = ({
     >
       <div className="px-20 py-12 bg-white bg-opacity-80  rounded-lg shadow-md">
         <Link to="/">
-          <Home />
+          <HousePlus />
         </Link>
         <h2 className="text-lg font-bold text-gray-700 mb-4">Login</h2>
         <form onSubmit={createSession}>
@@ -104,16 +95,16 @@ const Login = ({
               Show Password
             </label>
           </div>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <button
-              className="earth-500 hover:earth-700 text-white w-20 h-10 shadow-xl flex rounded items-center justify-center text-xl"
-              type="Submit"
+              className="earth-500 hover:earth-700 text-white px-5 py-2 shadow-xl flex rounded items-center justify-center text-lg"
+              type="submit"
             >
               Sign In
             </button>
-            <p style={{ marginLeft: "6px" }}>
-              No Account ? Click{" "}
-              <Link to="/signup" style={{ color: "blue" }}>
+            <p className="text-sm sm:ml-2 text-center sm:text-left">
+              No Account? Click{" "}
+              <Link to="/signup" className="text-blue-500 hover:underline">
                 here
               </Link>{" "}
               to sign up.
