@@ -256,6 +256,118 @@ const add_bid = async (base_url, session_token, bid_details) => {
   }
 };
 
+const get_my_notification = async (base_url, session_token) => {
+  console.log("Fetching all notifications... API call");
+  try {
+    const response = await fetch(`${base_url}/api/notifications`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session_token}`,
+      },
+    });
+    if (handleAuthError(response)) return;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data.result;
+  } catch (error) {
+    console.error("Error fetching loads:", error);
+    return error;
+  }
+};
+
+const send_notification = async (base_url, session_token, message) => {
+  console.log("Send all notifications... API call");
+  try {
+    const response = await fetch(`${base_url}/api/notifications/notify`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session_token}`,
+      },
+      body: JSON.stringify(message),
+    });
+    if (handleAuthError(response)) return;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response;
+  } catch (error) {
+    console.error("Error fetching loads:", error);
+    return error;
+  }
+};
+const clear_my_notification = async (base_url, session_token) => {
+  console.log("Clearing all notifications... API call");
+  try {
+    const response = await fetch(`${base_url}/api/notifications/clear`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session_token}`,
+      },
+    });
+    if (handleAuthError(response)) return;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response;
+  } catch (error) {
+    console.error("Error fetching loads:", error);
+    return error;
+  }
+};
+
+const mark_my_notification = async (base_url, session_token, payload) => {
+  console.log("Send all notifications... API call");
+  try {
+    const response = await fetch(`${base_url}/api/notifications/readunread`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session_token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+    if (handleAuthError(response)) return;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data.result;
+  } catch (error) {
+    console.error("Error fetching loads:", error);
+    return error;
+  }
+};
+
+const mark_all_read = async (base_url, session_token) => {
+  console.log("Send all notifications... API call");
+  try {
+    const response = await fetch(
+      `${base_url}/api/notifications/readunreadall`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session_token}`,
+        },
+      }
+    );
+    if (handleAuthError(response)) return;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data.result;
+  } catch (error) {
+    console.error("Error fetching loads:", error);
+    return error;
+  }
+};
+
 export {
   login,
   get_all_loads,
@@ -268,4 +380,9 @@ export {
   add_new_load,
   add_bid,
   signup,
+  get_my_notification,
+  send_notification,
+  clear_my_notification,
+  mark_my_notification,
+  mark_all_read,
 };

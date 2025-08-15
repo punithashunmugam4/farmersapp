@@ -85,6 +85,12 @@ const Home = ({
               })
             : [];
         if (visibleLoads.length > 0) {
+          visibleLoads = visibleLoads.filter((product) => {
+            if (product.name === tempSession.username) {
+              console.log("Own loads: ", product);
+              return false;
+            } else return true;
+          });
           if (filters === null) {
             setProducts(visibleLoads);
           } else {

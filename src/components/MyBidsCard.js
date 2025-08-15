@@ -117,7 +117,8 @@ export function MyBidsCard({ user, product, onBidClick }) {
               ).toFixed(2)}
             </p>
           </div>
-          {timeleft !== ("Accepted" || "Awarded") && !myBid.status ? (
+          {timeleft !== ("Ended" || "Closed" || "Accepted" || "Awarded") &&
+          !myBid.status ? (
             <button
               onClick={() => onBidClick(product, "accept_modal")}
               className="w-full p-2 farm-green-600 hover:farm-green-700 text-white"

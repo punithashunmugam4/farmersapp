@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { Dialog, DialogTitle, DialogContent, Button } from "@mui/material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { add_bid } from "../api_call";
+import { add_bid, send_notification } from "../api_call";
 
 const sleep = async (ms) =>
   await new Promise((resolve) => setTimeout(resolve, ms));
@@ -42,6 +42,14 @@ export function BidModal({ user, product, isOpen, onClose }) {
         { auction_id: product.auction_id, bid_amount: newBid }
       );
       if (res.status === 201 || res.status === 200) {
+        send_notification(
+          process.env.REACT_APP_API_URL,
+          sessionStorage.getItem("session_token_farmersapp"),
+          {
+            username: product.name,
+            message: `New bid placed for you item: ${product.product}`,
+          }
+        );
         toast.success("Bid submitted successfully!");
         await sleep(2000);
         onClose();

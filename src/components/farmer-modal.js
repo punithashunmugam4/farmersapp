@@ -92,6 +92,12 @@ export function FarmerModal({ user, isOpen, onClose, product }) {
     console.log("Submitting form data:", formData);
     let location = formData.location.split(", ");
     let zip = formData.location.split("-").pop().trim();
+    let visibleUsers =
+      formData.auctionViewers === ""
+        ? []
+        : formData.auctionViewers.includes(",")
+        ? formData.auctionViewers.split(",")
+        : [formData.auctionViewers];
     const loadDetails = {
       name: user?.username,
       email: user?.email,
@@ -114,10 +120,12 @@ export function FarmerModal({ user, isOpen, onClose, product }) {
       status: "Open",
       pick_up_range_start_date: formatDate(formData.pick_up_range_start_date),
       pick_up_range_end_date: formatDate(formData.pick_up_range_end_date),
-      visible_user: formData.auctionViewers,
+      visible_user: visibleUsers,
     };
     console.log("Load details to be sent:", loadDetails);
-
+    if (product) {
+      loadDetails.auction_id = product.auction_id;
+    }
     add_new_load(
       process.env.REACT_APP_API_URL,
       sessionStorage.getItem("session_token_farmersapp"),

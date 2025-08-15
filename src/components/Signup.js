@@ -3,6 +3,10 @@ import { Link } from "react-router-dom";
 import bg from "../assets/background.jpg";
 import { signup } from "../api_call";
 import Navigation from "./navigation.js";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
 
 const Signup = () => {
   const userRef = useRef(null);
@@ -32,9 +36,17 @@ const Signup = () => {
       alert("An error occurred while creating the user.");
     }
   };
+  const formatDate = (time) => {
+    let t = dayjs(time).format("YYYY-MM-DD");
+    return t;
+  };
 
   const handleChange = (field, value) => {
+    if (field === "dob") {
+      value = formatDate(value);
+    }
     setUserDetails((prev) => ({ ...prev, [field]: value }));
+    console.log(userDetails);
   };
   useEffect(() => {
     userRef.current && userRef.current.focus();
@@ -99,14 +111,27 @@ const Signup = () => {
                     >
                       Date of Birth
                     </label>
-                    <input
+                    {/* <input
                       required
                       className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading
    tight focus:outline-none focus:shadow-outline"
                       id="dob"
                       type="date"
                       onChange={(e) => handleChange("dob", e.target.value)}
-                    />
+                    /> */}
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DatePicker
+                        className="bg-white rounded text-gray-700"
+                        slotProps={{
+                          textField: {
+                            InputProps: {
+                              className: "h-11",
+                            },
+                          },
+                        }}
+                        onChange={(value) => handleChange("dob", value)}
+                      />
+                    </LocalizationProvider>
                   </div>
                   <div className="mb-4">
                     <label

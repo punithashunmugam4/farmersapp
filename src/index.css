@@ -124,6 +124,9 @@
   .bg-farm-red-600 {
     background-color: hsl(0, 98%, 50%);
   }
+  .bg-farm-blue-500 {
+    background-color: hsl(218, 80%, 86%);
+  }
 }
 
 .first-letter-caps::first-letter {

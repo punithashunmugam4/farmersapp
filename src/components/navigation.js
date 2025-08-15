@@ -1,7 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { Sprout, Bell, CircleUser } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Sprout, Bell, CircleUser, CheckCheck } from "lucide-react";
 import { Button } from "@mui/material";
+import {
+  get_my_notification,
+  mark_my_notification,
+  clear_my_notification,
+  mark_all_read,
+} from "../api_call";
 
 export default function Navigation({
   isSessionValid,
@@ -11,13 +17,83 @@ export default function Navigation({
   const navigate = useNavigate();
   const [showProfilenavigation, setShowProfilenavigation] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const notificationRef = useRef(null);
+  const profileRef = useRef(null);
+
+  const markAsRead = (v) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === v.id ? { ...n, read_mark: !v.read_mark } : n))
+    );
+    mark_my_notification(
+      process.env.REACT_APP_API_URL,
+      sessionStorage.getItem("session_token_farmersapp"),
+      { ...v, read_mark: !v.read_mark }
+    );
+  };
+
+  const markAllAsRead = () => {
+    mark_all_read(
+      process.env.REACT_APP_API_URL,
+      sessionStorage.getItem("session_token_farmersapp")
+    );
+    setNotifications((prev) => prev.map((n) => ({ ...n, read_mark: true })));
+  };
+
+  const getNotificationCall = async () => {
+    let temp_notification = await get_my_notification(
+      process.env.REACT_APP_API_URL,
+      sessionStorage.getItem("session_token_farmersapp")
+    );
+    setNotifications(() => {
+      console.log(temp_notification);
+      if (Array.isArray(temp_notification)) return temp_notification;
+      else return [];
+    });
+    return [];
+  };
+
+  const readAndNavigate = (v) => {
+    markAsRead(v);
+    if (v.message.includes("placed")) navigate("/myproducts");
+    else navigate("/mybids");
+  };
+
+  const clearAllNotifications = () => {
+    clear_my_notification(
+      process.env.REACT_APP_API_URL,
+      sessionStorage.getItem("session_token_farmersapp")
+    );
+    setNotifications([]);
+  };
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target)
+      ) {
+        setShowNotification(false);
+      }
+
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setShowProfilenavigation(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <nav className="bg-white bg-opacity-80 border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
-            <Link href="/" className="flex items-center">
+            <Link to="/" className="flex items-center">
               <Sprout className="text-farm-green-600 text-2xl mr-2" />
               <span className="text-xl font-bold text-gray-900">FarmBid</span>
             </Link>
@@ -46,9 +122,122 @@ export default function Navigation({
           </div>
           <div className="flex items-center space-x-4">
             <p>Welcome {user?.name} !</p>
-            <button className="text-gray-600 hover:text-gray-900">
-              <Bell className="w-5 h-5" />
-            </button>
+            <div className="relative">
+              <button
+                className="text-gray-600 hover:text-gray-900"
+                onClick={() => setShowNotification(!showNotification)}
+              >
+                <Bell className="w-5 h-5" onClick={getNotificationCall} />
+              </button>
+
+              {/* Desktop Nav */}
+              <div className="hidden md:block" ref={notificationRef}>
+                <div className="relative ">
+                  {showNotification && (
+                    <div className="absolute insert-0 z-50  bg-white shadow-md p-4 -top-1 -right-1 w-72 ">
+                      {isSessionValid ? (
+                        <ul className="space-y-2">
+                          <li className="flex justify-between text-sm cursor-pointer">
+                            <span onClick={clearAllNotifications}>
+                              Clear all
+                            </span>
+                            <CheckCheck onClick={() => markAllAsRead()} />
+                          </li>
+                          {notifications.length > 0 ? (
+                            notifications.map((v) => {
+                              return (
+                                <li
+                                  key={v.id}
+                                  className={`flex justify-between p-2 border-b-2 ${
+                                    v.read_mark ? "" : "bg-farm-blue-500"
+                                  }`}
+                                >
+                                  <p
+                                    className="block text-gray-700 hover:text-farm-green-600"
+                                    onClick={() => readAndNavigate(v)}
+                                  >
+                                    {v.message}
+                                  </p>
+                                  <CheckCheck
+                                    className={`cursor-pointer ${
+                                      v.read_mark ? "" : "text-farm-green-600"
+                                    }`}
+                                    onClick={() => markAsRead(v)}
+                                  />
+                                </li>
+                              );
+                            })
+                          ) : (
+                            <p>No notifications</p>
+                          )}
+                        </ul>
+                      ) : (
+                        <li className="flex justify-center">
+                          <p className="text-lg">Please Sign in</p>
+                        </li>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Mobile Menu */}
+              {showNotification && (
+                <div className="fixed md:hidden inset-0 bg-white z-50 p-6 overflow-y-auto">
+                  <button
+                    className="absolute top-4 right-4 text-gray-600 text-4xl"
+                    onClick={() => setShowNotification(false)}
+                  >
+                    &times;
+                  </button>
+                  <ul className="space-y-6 mt-12 text-lg">
+                    <li className="flex justify-between text-sm cursor-pointer">
+                      <span onClick={clearAllNotifications}>Clear all</span>
+                      <CheckCheck onClick={() => markAllAsRead()} />
+                    </li>
+                    {isSessionValid ? (
+                      Array.isArray(notifications) ? (
+                        notifications.map((v) => {
+                          return (
+                            <li
+                              key={v.id}
+                              className={`flex justify-between p-2 border-b-2 ${
+                                v.read_mark ? "" : "bg-farm-blue-500"
+                              }`}
+                            >
+                              <p
+                                onClick={() => readAndNavigate(v)}
+                                className="block text-gray-700 hover:text-farm-green-600"
+                              >
+                                {v.message}
+                              </p>
+                              <CheckCheck
+                                className={`cursor-pointer ${
+                                  v.read_mark ? "" : "text-farm-green-600"
+                                }`}
+                                onClick={() => markAsRead(v)}
+                              />
+                            </li>
+                          );
+                        })
+                      ) : (
+                        <p>No notifications</p>
+                      )
+                    ) : (
+                      <li className="flex justify-center">
+                        <button
+                          className="farm-green-600 hover:farm-green-800 text-white w-24 rounded shadow-xl h-14 text-l"
+                          onClick={() => navigate("/login")}
+                        >
+                          Please Sign in
+                        </button>
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              )}
+            </div>
+
             <div className="relative">
               {/* Hamburger for mobile */}
               <button
@@ -83,7 +272,10 @@ export default function Navigation({
                       <CircleUser />
                     </button>
                     {showProfilenavigation && (
-                      <div className="absolute bg-white shadow-md p-4 w-36">
+                      <div
+                        className="absolute bg-white shadow-md p-4 w-36"
+                        ref={profileRef}
+                      >
                         <ul className="space-y-2">
                           <li>
                             <Link
