@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { Sprout, Bell, CircleUser, CheckCheck } from "lucide-react";
+import { Sprout, Bell, CircleUser, CheckCheck, Loader2 } from "lucide-react";
 import { Button } from "@mui/material";
 import {
   get_my_notification,
@@ -21,6 +21,7 @@ export default function Navigation({
   const [notifications, setNotifications] = useState([]);
   const notificationRef = useRef(null);
   const profileRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const markAsRead = (v) => {
     setNotifications((prev) =>
@@ -51,7 +52,7 @@ export default function Navigation({
       if (Array.isArray(temp_notification)) return temp_notification;
       else return [];
     });
-    return [];
+    setIsLoading(false);
   };
 
   const readAndNavigate = (v) => {
@@ -143,12 +144,17 @@ export default function Navigation({
                             </span>
                             <CheckCheck onClick={() => markAllAsRead()} />
                           </li>
+                          {isLoading && (
+                            <div className="flex justify-center items-center p-4">
+                              <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+                            </div>
+                          )}
                           {notifications.length > 0 ? (
                             notifications.map((v) => {
                               return (
                                 <li
                                   key={v.id}
-                                  className={`flex justify-between p-2 border-b-2 ${
+                                  className={`flex justify-between p-2 border-b-2 animate-pulse ${
                                     v.read_mark ? "" : "bg-farm-blue-500"
                                   }`}
                                 >
@@ -190,13 +196,19 @@ export default function Navigation({
                   >
                     &times;
                   </button>
-                  <ul className="space-y-6 mt-12 text-lg">
-                    <li className="flex justify-between text-sm cursor-pointer">
-                      <span onClick={clearAllNotifications}>Clear all</span>
-                      <CheckCheck onClick={() => markAllAsRead()} />
-                    </li>
-                    {isSessionValid ? (
-                      Array.isArray(notifications) ? (
+                  {isSessionValid ? (
+                    <ul className="space-y-6 mt-12 text-lg">
+                      <li className="flex justify-between text-sm cursor-pointer">
+                        <span onClick={clearAllNotifications}>Clear all</span>
+                        <CheckCheck onClick={() => markAllAsRead()} />
+                      </li>
+                      {isLoading && (
+                        <div className="flex justify-center items-center p-4">
+                          <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+                        </div>
+                      )}
+
+                      {Array.isArray(notifications) ? (
                         notifications.map((v) => {
                           return (
                             <li
@@ -222,22 +234,21 @@ export default function Navigation({
                         })
                       ) : (
                         <p>No notifications</p>
-                      )
-                    ) : (
-                      <li className="flex justify-center">
-                        <button
-                          className="farm-green-600 hover:farm-green-800 text-white w-24 rounded shadow-xl h-14 text-l"
-                          onClick={() => navigate("/login")}
-                        >
-                          Please Sign in
-                        </button>
-                      </li>
-                    )}
-                  </ul>
+                      )}
+                    </ul>
+                  ) : (
+                    <li className="flex justify-center">
+                      <button
+                        className="farm-green-600 hover:farm-green-800 text-white w-24 rounded shadow-xl h-14 text-l"
+                        onClick={() => navigate("/login")}
+                      >
+                        Please Sign in
+                      </button>
+                    </li>
+                  )}
                 </div>
               )}
             </div>
-
             <div className="relative">
               {/* Hamburger for mobile */}
               <button
