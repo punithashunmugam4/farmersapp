@@ -27,15 +27,15 @@ export default function Navigation({
 
   const markAsRead = (v) => {
     setNotifications((prev) =>
-      prev.map((n) => (n.id === v.id ? { ...n, read_mark: !v.read_mark } : n))
+      prev.map((n) => (n.id === v.id ? { ...n, is_read: !v.is_read } : n))
     );
-    if (!v.read_mark) setUnreadCount((prev) => prev - 1);
+    if (!v.is_read) setUnreadCount((prev) => prev - 1);
     else setUnreadCount((prev) => prev + 1);
 
     mark_my_notification(
       process.env.REACT_APP_API_URL,
       sessionStorage.getItem("session_token_farmersapp"),
-      { ...v, read_mark: !v.read_mark }
+      { ...v, is_read: !v.is_read }
     );
   };
 
@@ -44,7 +44,7 @@ export default function Navigation({
       process.env.REACT_APP_API_URL,
       sessionStorage.getItem("session_token_farmersapp")
     );
-    setNotifications((prev) => prev.map((n) => ({ ...n, read_mark: true })));
+    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
     setUnreadCount(0);
   };
 
@@ -61,7 +61,7 @@ export default function Navigation({
       });
       setUnreadCount(
         Array.isArray(temp_notification)
-          ? temp_notification.filter((e) => !e.read_mark).length
+          ? temp_notification.filter((e) => !e.is_read).length
           : 0
       );
     }
@@ -107,7 +107,7 @@ export default function Navigation({
         );
         setUnreadCount(
           Array.isArray(temp_notification)
-            ? temp_notification.filter((e) => !e.read_mark).length
+            ? temp_notification.filter((e) => !e.is_read).length
             : 0
         );
         setNotifications(() => {
@@ -201,7 +201,7 @@ export default function Navigation({
                                 <li
                                   key={v.id}
                                   className={`flex justify-between p-2 border-b-2 animate-pulse ${
-                                    v.read_mark ? "" : "bg-farm-blue-500"
+                                    v.is_read ? "" : "bg-farm-blue-500"
                                   }`}
                                 >
                                   <p
@@ -212,7 +212,7 @@ export default function Navigation({
                                   </p>
                                   <CheckCheck
                                     className={`cursor-pointer ${
-                                      v.read_mark ? "" : "text-farm-green-600"
+                                      v.is_read ? "" : "text-farm-green-600"
                                     }`}
                                     onClick={() => markAsRead(v)}
                                   />
@@ -260,7 +260,7 @@ export default function Navigation({
                             <li
                               key={v.id}
                               className={`flex justify-between p-2 border-b-2 ${
-                                v.read_mark ? "" : "bg-farm-blue-500"
+                                v.is_read ? "" : "bg-farm-blue-500"
                               }`}
                             >
                               <p
@@ -271,7 +271,7 @@ export default function Navigation({
                               </p>
                               <CheckCheck
                                 className={`cursor-pointer ${
-                                  v.read_mark ? "" : "text-farm-green-600"
+                                  v.is_read ? "" : "text-farm-green-600"
                                 }`}
                                 onClick={() => markAsRead(v)}
                               />
