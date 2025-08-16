@@ -21,12 +21,17 @@ export default function Navigation({
   const [notifications, setNotifications] = useState([]);
   const notificationRef = useRef(null);
   const profileRef = useRef(null);
+  const [mobileNotification, setMobileNotification] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const markAsRead = (v) => {
     setNotifications((prev) =>
       prev.map((n) => (n.id === v.id ? { ...n, read_mark: !v.read_mark } : n))
     );
+    if (!v.read_mark) setUnreadCount((prev) => prev - 1);
+    else setUnreadCount((prev) => prev + 1);
+
     mark_my_notification(
       process.env.REACT_APP_API_URL,
       sessionStorage.getItem("session_token_farmersapp"),
@@ -40,6 +45,7 @@ export default function Navigation({
       sessionStorage.getItem("session_token_farmersapp")
     );
     setNotifications((prev) => prev.map((n) => ({ ...n, read_mark: true })));
+    setUnreadCount(0);
   };
 
   const getNotificationCall = async () => {
@@ -52,11 +58,17 @@ export default function Navigation({
       if (Array.isArray(temp_notification)) return temp_notification;
       else return [];
     });
+    setUnreadCount(
+      Array.isArray(temp_notification)
+        ? temp_notification.filter((e) => !e.read_mark).length
+        : 0
+    );
     setIsLoading(false);
   };
 
   const readAndNavigate = (v) => {
     markAsRead(v);
+    setUnreadCount((prev) => prev - 1);
     if (v.message.includes("placed")) navigate("/myproducts");
     else navigate("/mybids");
   };
@@ -66,11 +78,13 @@ export default function Navigation({
       process.env.REACT_APP_API_URL,
       sessionStorage.getItem("session_token_farmersapp")
     );
+    setUnreadCount(0);
     setNotifications([]);
   };
 
   useEffect(() => {
     function handleClickOutside(event) {
+      // Notification popup
       if (
         notificationRef.current &&
         !notificationRef.current.contains(event.target)
@@ -78,10 +92,28 @@ export default function Navigation({
         setShowNotification(false);
       }
 
+      // Profile dropdown
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setShowProfilenavigation(false);
       }
     }
+
+    (async () => {
+      let temp_notification = await get_my_notification(
+        process.env.REACT_APP_API_URL,
+        sessionStorage.getItem("session_token_farmersapp")
+      );
+      setUnreadCount(
+        Array.isArray(temp_notification)
+          ? temp_notification.filter((e) => !e.read_mark).length
+          : 0
+      );
+      setNotifications(() => {
+        console.log(temp_notification);
+        if (Array.isArray(temp_notification)) return temp_notification;
+        else return [];
+      });
+    })();
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
@@ -126,16 +158,28 @@ export default function Navigation({
             <div className="relative">
               <button
                 className="text-gray-600 hover:text-gray-900"
-                onClick={() => setShowNotification(!showNotification)}
+                onClick={() => {
+                  setShowNotification(!showNotification);
+                  setMobileNotification(!mobileNotification);
+                }}
               >
-                <Bell className="w-5 h-5" onClick={getNotificationCall} />
+                <Bell className="w-6 h-6" onClick={getNotificationCall} />
+                {/* Badge */}
+                {unreadCount > 0 && (
+                  <span className="absolute -top-2 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                    {unreadCount}
+                  </span>
+                )}
               </button>
 
               {/* Desktop Nav */}
-              <div className="hidden md:block" ref={notificationRef}>
+              <div className="hidden md:block">
                 <div className="relative ">
                   {showNotification && (
-                    <div className="absolute insert-0 z-50  bg-white shadow-md p-4 -top-1 -right-1 w-72 ">
+                    <div
+                      className="absolute insert-0 z-50  bg-white shadow-md p-4 -top-1 -right-1 w-72 "
+                      ref={notificationRef}
+                    >
                       {isSessionValid ? (
                         <ul className="space-y-2">
                           <li className="flex justify-between text-sm cursor-pointer">
@@ -188,11 +232,11 @@ export default function Navigation({
               </div>
 
               {/* Mobile Menu */}
-              {showNotification && (
+              {mobileNotification && (
                 <div className="fixed md:hidden inset-0 bg-white z-50 p-6 overflow-y-auto">
                   <button
                     className="absolute top-4 right-4 text-gray-600 text-4xl"
-                    onClick={() => setShowNotification(false)}
+                    onClick={() => setMobileNotification(false)}
                   >
                     &times;
                   </button>

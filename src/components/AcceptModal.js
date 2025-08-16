@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Dialog, DialogTitle, DialogContent, Button } from "@mui/material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { add_new_load } from "../api_call";
+import { add_new_load, send_notification } from "../api_call";
 
 const update_bid_status = add_new_load;
 const sleep = async (ms) =>
@@ -51,6 +51,14 @@ export function AcceptModal({ user, product, isOpen, onClose }) {
       );
       if (res.status === 201 || res.status === 200) {
         setIsAccepted(bid_status === "Accepted" ? true : false);
+        send_notification(
+          process.env.REACT_APP_API_URL,
+          sessionStorage.getItem("session_token_farmersapp"),
+          {
+            username: bid.name,
+            message: `Your bid on ${product.product} is ${bid_status}`,
+          }
+        );
         toast.success(`Bid ${bid_status} successfully!`);
         await sleep(2000);
         onClose();
