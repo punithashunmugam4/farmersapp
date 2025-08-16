@@ -47,7 +47,7 @@ export function BidModal({ user, product, isOpen, onClose }) {
           sessionStorage.getItem("session_token_farmersapp"),
           {
             username: product.name,
-            message: `New bid placed for you item: ${product.product}`,
+            message: `New bid placed for your item: ${product.product}`,
           }
         );
         toast.success("Bid submitted successfully!");
