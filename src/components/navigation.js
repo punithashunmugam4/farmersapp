@@ -121,7 +121,7 @@ export default function Navigation({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [isSessionValid]);
 
   return (
     <nav className="bg-white bg-opacity-80 border-b border-gray-200 sticky top-0 z-50">
