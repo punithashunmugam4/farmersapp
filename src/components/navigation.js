@@ -49,20 +49,22 @@ export default function Navigation({
   };
 
   const getNotificationCall = async () => {
-    let temp_notification = await get_my_notification(
-      process.env.REACT_APP_API_URL,
-      sessionStorage.getItem("session_token_farmersapp")
-    );
-    setNotifications(() => {
-      console.log(temp_notification);
-      if (Array.isArray(temp_notification)) return temp_notification;
-      else return [];
-    });
-    setUnreadCount(
-      Array.isArray(temp_notification)
-        ? temp_notification.filter((e) => !e.read_mark).length
-        : 0
-    );
+    if (isSessionValid) {
+      let temp_notification = await get_my_notification(
+        process.env.REACT_APP_API_URL,
+        sessionStorage.getItem("session_token_farmersapp")
+      );
+      setNotifications(() => {
+        console.log(temp_notification);
+        if (Array.isArray(temp_notification)) return temp_notification;
+        else return [];
+      });
+      setUnreadCount(
+        Array.isArray(temp_notification)
+          ? temp_notification.filter((e) => !e.read_mark).length
+          : 0
+      );
+    }
     setIsLoading(false);
   };
 
@@ -97,24 +99,24 @@ export default function Navigation({
         setShowProfilenavigation(false);
       }
     }
-
-    (async () => {
-      let temp_notification = await get_my_notification(
-        process.env.REACT_APP_API_URL,
-        sessionStorage.getItem("session_token_farmersapp")
-      );
-      setUnreadCount(
-        Array.isArray(temp_notification)
-          ? temp_notification.filter((e) => !e.read_mark).length
-          : 0
-      );
-      setNotifications(() => {
-        console.log(temp_notification);
-        if (Array.isArray(temp_notification)) return temp_notification;
-        else return [];
-      });
-    })();
-
+    if (isSessionValid) {
+      (async () => {
+        let temp_notification = await get_my_notification(
+          process.env.REACT_APP_API_URL,
+          sessionStorage.getItem("session_token_farmersapp")
+        );
+        setUnreadCount(
+          Array.isArray(temp_notification)
+            ? temp_notification.filter((e) => !e.read_mark).length
+            : 0
+        );
+        setNotifications(() => {
+          console.log(temp_notification);
+          if (Array.isArray(temp_notification)) return temp_notification;
+          else return [];
+        });
+      })();
+    }
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
