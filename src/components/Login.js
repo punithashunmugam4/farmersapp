@@ -4,24 +4,10 @@ import { login } from "../api_call";
 import bg from "../assets/background.jpg";
 import { HousePlus } from "lucide-react";
 
-const Login = ({
-  isSessionValid,
-  setIsSessionValid,
-  validateSession,
-  setUser,
-}) => {
+const Login = ({ setUser }) => {
   const navigate = useNavigate();
   const userRef = useRef(null);
   const [showPassword, setShowPassword] = useState(false);
-
-  useEffect(() => {
-    console.log("Running UseEffect in Login.js");
-    console.log("Is valid session: ", isSessionValid);
-    userRef.current && userRef.current.focus();
-    if (isSessionValid) {
-      navigate("/");
-    }
-  }, [isSessionValid, navigate]);
 
   const createSession = async (e) => {
     e.preventDefault();
@@ -31,12 +17,13 @@ const Login = ({
     const userdata = await login(
       process.env.REACT_APP_API_URL,
       username,
-      password
+      password,
     );
     if (userdata && userdata.token) {
       setUser(userdata.user);
-      setIsSessionValid(true);
       navigate("/");
+    } else if (userdata === 500) {
+      navigate("/*");
     } else {
       alert("Login failed. Please check your credentials.");
     }
@@ -95,6 +82,7 @@ const Login = ({
               Show Password
             </label>
           </div>
+
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <button
               className="earth-500 hover:earth-700 text-white px-5 py-2 shadow-xl flex rounded items-center justify-center text-lg"

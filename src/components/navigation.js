@@ -9,11 +9,7 @@ import {
   mark_all_read,
 } from "../api_call";
 
-export default function Navigation({
-  isSessionValid,
-  setIsSessionValid,
-  user,
-}) {
+export default function Navigation({ user }) {
   const navigate = useNavigate();
   const [showProfilenavigation, setShowProfilenavigation] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -27,7 +23,7 @@ export default function Navigation({
 
   const markAsRead = (v) => {
     setNotifications((prev) =>
-      prev.map((n) => (n.id === v.id ? { ...n, is_read: !v.is_read } : n))
+      prev.map((n) => (n.id === v.id ? { ...n, is_read: !v.is_read } : n)),
     );
     if (!v.is_read) setUnreadCount((prev) => prev - 1);
     else setUnreadCount((prev) => prev + 1);
@@ -35,24 +31,24 @@ export default function Navigation({
     mark_my_notification(
       process.env.REACT_APP_API_URL,
       sessionStorage.getItem("session_token_farmersapp"),
-      { ...v, is_read: !v.is_read }
+      { ...v, is_read: !v.is_read },
     );
   };
 
   const markAllAsRead = () => {
     mark_all_read(
       process.env.REACT_APP_API_URL,
-      sessionStorage.getItem("session_token_farmersapp")
+      sessionStorage.getItem("session_token_farmersapp"),
     );
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
     setUnreadCount(0);
   };
 
   const getNotificationCall = async () => {
-    if (isSessionValid) {
+    if (!!sessionStorage.getItem("session_token_farmersapp")) {
       let temp_notification = await get_my_notification(
         process.env.REACT_APP_API_URL,
-        sessionStorage.getItem("session_token_farmersapp")
+        sessionStorage.getItem("session_token_farmersapp"),
       );
       setNotifications(() => {
         console.log(temp_notification);
@@ -62,7 +58,7 @@ export default function Navigation({
       setUnreadCount(
         Array.isArray(temp_notification)
           ? temp_notification.filter((e) => !e.is_read).length
-          : 0
+          : 0,
       );
     }
     setIsLoading(false);
@@ -78,7 +74,7 @@ export default function Navigation({
   const clearAllNotifications = () => {
     clear_my_notification(
       process.env.REACT_APP_API_URL,
-      sessionStorage.getItem("session_token_farmersapp")
+      sessionStorage.getItem("session_token_farmersapp"),
     );
     setUnreadCount(0);
     setNotifications([]);
@@ -99,16 +95,16 @@ export default function Navigation({
         setShowProfilenavigation(false);
       }
     }
-    if (isSessionValid) {
+    if (!!sessionStorage.getItem("session_token_farmersapp")) {
       (async () => {
         let temp_notification = await get_my_notification(
           process.env.REACT_APP_API_URL,
-          sessionStorage.getItem("session_token_farmersapp")
+          sessionStorage.getItem("session_token_farmersapp"),
         );
         setUnreadCount(
           Array.isArray(temp_notification)
             ? temp_notification.filter((e) => !e.is_read).length
-            : 0
+            : 0,
         );
         setNotifications(() => {
           console.log(temp_notification);
@@ -121,7 +117,7 @@ export default function Navigation({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isSessionValid]);
+  }, []);
 
   return (
     <nav className="bg-white bg-opacity-80 border-b border-gray-200 sticky top-0 z-50">
@@ -142,7 +138,7 @@ export default function Navigation({
                 </Link>
                 <Link
                   to="/myproducts"
-                  className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm"
+                  className="text-gray-600 hover:text-gray-900 after:text-farm-green-600 px-3 py-2 rounded-md text-sm"
                 >
                   Sell Products
                 </Link>
@@ -182,7 +178,7 @@ export default function Navigation({
                       className="absolute insert-0 z-50  bg-white shadow-md p-4 -top-1 -right-1 w-72 "
                       ref={notificationRef}
                     >
-                      {isSessionValid ? (
+                      {!!sessionStorage.getItem("session_token_farmersapp") ? (
                         <ul className="space-y-2">
                           <li className="flex justify-between text-sm cursor-pointer">
                             <span onClick={clearAllNotifications}>
@@ -242,7 +238,7 @@ export default function Navigation({
                   >
                     &times;
                   </button>
-                  {isSessionValid ? (
+                  {!!sessionStorage.getItem("session_token_farmersapp") ? (
                     <ul className="space-y-6 mt-12 text-lg">
                       <li className="flex justify-between text-sm cursor-pointer">
                         <span onClick={clearAllNotifications}>Clear all</span>
@@ -318,7 +314,7 @@ export default function Navigation({
 
               {/* Desktop Nav */}
               <div className="hidden md:block">
-                {isSessionValid ? (
+                {!!sessionStorage.getItem("session_token_farmersapp") ? (
                   <div className="relative">
                     <button
                       onClick={() =>
@@ -362,10 +358,9 @@ export default function Navigation({
                             <Button
                               className="block text-gray-700 hover:text-white hover:bg-farm-red-500 w-full text-left"
                               onClick={() => {
-                                setIsSessionValid(false);
                                 setShowProfilenavigation(false);
                                 sessionStorage.removeItem(
-                                  "session_token_farmersapp"
+                                  "session_token_farmersapp",
                                 );
                                 navigate("/login");
                               }}
@@ -397,7 +392,7 @@ export default function Navigation({
                     &times;
                   </button>
                   <ul className="space-y-6 mt-12 text-lg">
-                    {isSessionValid ? (
+                    {!!sessionStorage.getItem("session_token_farmersapp") ? (
                       <>
                         <li>
                           <Link
@@ -427,10 +422,9 @@ export default function Navigation({
                           <Button
                             className="block text-gray-700 hover:text-white hover:bg-farm-red-500 w-full text-left"
                             onClick={() => {
-                              setIsSessionValid(false);
                               setShowMobileMenu(false);
                               sessionStorage.removeItem(
-                                "session_token_farmersapp"
+                                "session_token_farmersapp",
                               );
                               navigate("/login");
                             }}

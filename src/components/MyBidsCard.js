@@ -17,16 +17,16 @@ export function MyBidsCard({ user, product, onBidClick }) {
     const start_time = new Date(
       created_time.split("T")[0] +
         " " +
-        created_time.split("T")[1].split(".")[0]
+        created_time.split("T")[1].split(".")[0],
     );
-    // console.log("Start time:", start_time);
-    // console.log("Current time:", now);
+    console.log("Start time:", start_time);
+    console.log("Current time:", now);
     const end_time = new Date(
-      start_time.setHours(start_time.getHours() + auction_hrs)
+      start_time.setHours(start_time.getHours() + auction_hrs),
     );
-    // console.log("End time:", end_time);
+    console.log("End time:", end_time);
     const diff = end_time.getTime() - now.getTime();
-    // console.log("Time left calculation:", diff);
+    console.log("Time left calculation:", diff);
     if (diff <= 0) return "Ended";
 
     const hours = Math.floor(diff / (1000 * 60 * 60));
@@ -41,11 +41,7 @@ export function MyBidsCard({ user, product, onBidClick }) {
     }
     return `${minutes}mins left`;
   };
-  var timeleft = getTimeLeft(
-    4,
-    "2025-08-12T20:11:23.000Z" // product.auction_time_hrs,
-    //  product.createdAt
-  );
+  var timeleft = getTimeLeft(product.auction_time_hrs, product.createdAt);
 
   if (myBid.status) {
     timeleft = myBid.status;
@@ -113,7 +109,7 @@ export function MyBidsCard({ user, product, onBidClick }) {
               Rs.{" "}
               {parseFloat(
                 product?.all_bids.filter((bid) => bid.name === user.username)[0]
-                  .submit_amount || 0
+                  .submit_amount || 0,
               ).toFixed(2)}
             </p>
           </div>

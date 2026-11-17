@@ -7,18 +7,34 @@ const handleAuthError = (response) => {
   return false;
 };
 
+const defaultHeaders = {
+  "Content-Type": "application/json",
+  "ngrok-skip-browser-warning": "true",
+};
+
+const buildHeaders = (session_token) => {
+  const headers = { ...defaultHeaders };
+  if (session_token) headers.Authorization = `Bearer ${session_token}`;
+  return headers;
+};
+
 const login = async (base_url, username, password) => {
   try {
     const response = await fetch(`${base_url}/api/user/login`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: buildHeaders(),
       body: JSON.stringify({ username, password }),
     });
     if (handleAuthError(response)) return;
+    if (response.status === 500) {
+      window.location.href = "/*";
+      throw new Error("Server error! Please try again later.");
+    }
+    console.log("Response: ", response.ok);
     if (!response.ok) {
-      return new Error(`HTTP error! status: ${response.status}`);
+      window.location.href = "/*";
+      console.error(`HTTP error! status: ${response.status}`);
+      return response.status;
     }
     const data = await response.json();
     if (data.token) {
@@ -29,7 +45,8 @@ const login = async (base_url, username, password) => {
     }
   } catch (error) {
     console.error("Error during login:", error);
-    return error;
+    window.location.href = "/*";
+    return 500;
   }
 };
 
@@ -37,12 +54,14 @@ const signup = async (base_url, user_details) => {
   try {
     const response = await fetch(`${base_url}/api/user/signup`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: buildHeaders(),
       body: JSON.stringify(user_details),
     });
     if (handleAuthError(response)) return;
+    if (response.status === 500) {
+      window.location.href = "/*";
+      throw new Error("Server error! Please try again later.");
+    }
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -59,10 +78,7 @@ const get_all_loads = async (base_url, session_token) => {
   try {
     const response = await fetch(`${base_url}/api/data/getvisibleloads`, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session_token}`,
-      },
+      headers: buildHeaders(session_token),
     });
     if (handleAuthError(response)) return;
     if (!response.ok) {
@@ -81,10 +97,7 @@ const get_my_loads = async (base_url, session_token) => {
   try {
     const response = await fetch(`${base_url}/api/data/getmyproducts`, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session_token}`,
-      },
+      headers: buildHeaders(session_token),
     });
     if (handleAuthError(response)) return;
     if (!response.ok) {
@@ -103,10 +116,7 @@ const get_my_bids = async (base_url, session_token) => {
   try {
     const response = await fetch(`${base_url}/api/data/getmybids`, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session_token}`,
-      },
+      headers: buildHeaders(session_token),
     });
     if (handleAuthError(response)) return;
     if (!response.ok) {
@@ -126,11 +136,8 @@ const get_user_details = async (base_url, session_token, req_user) => {
       `${base_url}/api/user/getuserdetails/?username=${req_user}`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session_token}`,
-        },
-      }
+        headers: buildHeaders(session_token),
+      },
     );
     if (handleAuthError(response)) return;
     if (!response.ok) {
@@ -149,10 +156,7 @@ const get_my_user_details = async (base_url, session_token) => {
   try {
     const response = await fetch(`${base_url}/api/user/getuserdetails`, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session_token}`,
-      },
+      headers: buildHeaders(session_token),
     });
     if (handleAuthError(response)) return;
     if (!response.ok) {
@@ -165,39 +169,11 @@ const get_my_user_details = async (base_url, session_token) => {
     return error;
   }
 };
-
-const validateSession_call = async (base_url, session_token) => {
-  console.log("Validating session with token");
-  try {
-    const response = await fetch(`${base_url}/api/user/validate`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session_token}`,
-      },
-    });
-    // if (handleAuthError(response)) return false;
-    if (response.status !== 200) {
-      console.log("Session expired or invalid: ", response.status);
-      return false;
-    } else {
-      console.log("Session is valid: ", response.status);
-      return response.json();
-    }
-  } catch (error) {
-    console.error("Error validating session:", error);
-    return false;
-  }
-};
-
 const update_user_details = async (base_url, session_token, user_details) => {
   try {
     const response = await fetch(`${base_url}/api/user/update`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session_token}`,
-      },
+      headers: buildHeaders(session_token),
       body: JSON.stringify(user_details),
     });
     if (handleAuthError(response)) return;
@@ -216,10 +192,7 @@ const add_new_load = async (base_url, session_token, load_details) => {
   try {
     const response = await fetch(`${base_url}/api/data/addload`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session_token}`,
-      },
+      headers: buildHeaders(session_token),
       body: JSON.stringify(load_details),
     });
     if (handleAuthError(response)) return;
@@ -238,10 +211,7 @@ const add_bid = async (base_url, session_token, bid_details) => {
   try {
     const response = await fetch(`${base_url}/api/data/addbids`, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session_token}`,
-      },
+      headers: buildHeaders(session_token),
       body: JSON.stringify(bid_details),
     });
     if (handleAuthError(response)) return;
@@ -261,10 +231,7 @@ const get_my_notification = async (base_url, session_token) => {
   try {
     const response = await fetch(`${base_url}/api/notifications`, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session_token}`,
-      },
+      headers: buildHeaders(session_token),
     });
     if (handleAuthError(response)) return;
     if (!response.ok) {
@@ -283,10 +250,7 @@ const send_notification = async (base_url, session_token, message) => {
   try {
     const response = await fetch(`${base_url}/api/notifications/notify`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session_token}`,
-      },
+      headers: buildHeaders(session_token),
       body: JSON.stringify(message),
     });
     if (handleAuthError(response)) return;
@@ -304,10 +268,7 @@ const clear_my_notification = async (base_url, session_token) => {
   try {
     const response = await fetch(`${base_url}/api/notifications/clear`, {
       method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session_token}`,
-      },
+      headers: buildHeaders(session_token),
     });
     if (handleAuthError(response)) return;
     if (!response.ok) {
@@ -325,10 +286,7 @@ const mark_my_notification = async (base_url, session_token, payload) => {
   try {
     const response = await fetch(`${base_url}/api/notifications/readunread`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session_token}`,
-      },
+      headers: buildHeaders(session_token),
       body: JSON.stringify(payload),
     });
     if (handleAuthError(response)) return;
@@ -350,11 +308,8 @@ const mark_all_read = async (base_url, session_token) => {
       `${base_url}/api/notifications/readunreadall`,
       {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session_token}`,
-        },
-      }
+        headers: buildHeaders(session_token),
+      },
     );
     if (handleAuthError(response)) return;
     if (!response.ok) {
@@ -375,7 +330,6 @@ export {
   get_my_bids,
   get_my_user_details,
   get_user_details,
-  validateSession_call,
   update_user_details,
   add_new_load,
   add_bid,

@@ -6,19 +6,9 @@ import { Footer } from "./footer.js";
 import SearchFilters from "./search-filters.js";
 import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
-import {
-  get_my_user_details,
-  get_my_loads,
-  validateSession_call,
-} from "../api_call";
+import { get_my_user_details, get_my_loads } from "../api_call";
 
-const MyProducts = ({
-  isSessionValid,
-  setIsSessionValid,
-  validateSession,
-  user,
-  setUser,
-}) => {
+const MyProducts = ({ user, setUser }) => {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // test - change to true for initial loading state
   const [filters, setFilters] = useState(null);
@@ -27,44 +17,19 @@ const MyProducts = ({
   const [showFarmerModal, setShowFarmerModal] = useState(false);
 
   useEffect(() => {
-    console.log("Running UseEffect in home.js");
+    console.log("Running UseEffect in MyProducts.js");
     (async () => {
       let token = sessionStorage.getItem("session_token_farmersapp");
-      const validateSession_x = async () => {
-        const token = sessionStorage.getItem("session_token_farmersapp");
-        let res = await validateSession_call(
-          process.env.REACT_APP_API_URL,
-          token
-        );
-        if (res === false) {
-          setUser(null);
-          return false;
-        }
-        if (res.username) {
-          return res;
-        }
-      };
-      console.log("Validating session in Home.js");
-      let tempSession = await validateSession_x();
-      if (tempSession === false) {
-        console.log("Session is invalid, redirecting to login page.");
-        setIsSessionValid(false);
-        setIsLoading(false);
-        // navigate("/login");
-      } else if (tempSession.username) {
-        console.log("Get usedetails in Home.js");
+      if (token) {
+        console.log("Get user details in MyProducts.js");
         let user_details = await get_my_user_details(
           process.env.REACT_APP_API_URL,
-          token
+          token,
         );
         setUser(user_details);
-        setIsSessionValid(true);
         setIsLoading(true);
-        console.log("Fetching products in Home.js");
-        let myLoads = await get_my_loads(
-          process.env.REACT_APP_API_URL,
-          sessionStorage.getItem("session_token_farmersapp")
-        );
+        console.log("Fetching products in MyProducts.js");
+        let myLoads = await get_my_loads(process.env.REACT_APP_API_URL, token);
         if (myLoads.length > 0) {
           if (filters === null) {
             setProducts(myLoads);
@@ -104,7 +69,7 @@ const MyProducts = ({
                     .toLowerCase()
                     .includes(filters.search.toLowerCase()) ||
                   JSON.stringify(product.product_location).includes(
-                    filters.search
+                    filters.search,
                   )
                 ) {
                   console.log("Search found: ", product);
@@ -115,17 +80,10 @@ const MyProducts = ({
             });
           }
         }
-        setIsLoading(false);
       }
+      setIsLoading(false);
     })();
-  }, [
-    isSessionValid,
-    showFarmerModal,
-    showAcceptModal,
-    filters,
-    setIsSessionValid,
-    setUser,
-  ]);
+  }, [showFarmerModal, showAcceptModal, filters, setUser]);
 
   const handleBidClick = (product, modal) => {
     setSelectedProduct(product);
@@ -138,12 +96,12 @@ const MyProducts = ({
     const start_time = new Date(
       created_time.split("T")[0] +
         " " +
-        created_time.split("T")[1].split(".")[0]
+        created_time.split("T")[1].split(".")[0],
     );
     // console.log("Start time:", start_time);
     // console.log("Current time:", now);
     const end_time = new Date(
-      start_time.setHours(start_time.getHours() + auction_hrs)
+      start_time.setHours(start_time.getHours() + auction_hrs),
     );
     // console.log("End time:", end_time);
     const diff = end_time.getTime() - now.getTime();
@@ -165,11 +123,7 @@ const MyProducts = ({
 
   return (
     <div id="my-products">
-      <Navigation
-        isSessionValid={isSessionValid}
-        setIsSessionValid={setIsSessionValid}
-        user={user}
-      />
+      <Navigation user={user} />
       <SearchFilters onFiltersChange={setFilters} />
       <section id="products" className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -184,7 +138,7 @@ const MyProducts = ({
 
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {[...Array(8)].map((_, i) => (
+              {[...Array(4)].map((_, i) => (
                 <div
                   key={i}
                   className="bg-white rounded-xl shadow-lg overflow-hidden animate-pulse"
@@ -204,7 +158,7 @@ const MyProducts = ({
                 products.map((product) => {
                   let timeleft = getTimeLeft(
                     product.auction_time_hrs,
-                    product.createdAt
+                    product.createdAt,
                   );
                   if (
                     product.status === "Closed" ||

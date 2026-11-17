@@ -8,72 +8,42 @@ import { useState, useEffect } from "react";
 import Navigation from "./navigation.js";
 import HeroSection from "./hero-section.js";
 import SearchFilters from "./search-filters.js";
-import {
-  get_all_loads,
-  get_my_user_details,
-  validateSession_call,
-} from "../api_call.js";
+import { get_all_loads, get_my_user_details } from "../api_call.js";
+import { useNavigate } from "react-router";
 
-const Home = ({
-  isSessionValid,
-  setIsSessionValid,
-  validateSession,
-  user,
-  setUser,
-}) => {
+const Home = ({ user, setUser }) => {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // test - change to true for initial loading state
   const [filters, setFilters] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showBidModal, setShowBidModal] = useState(false);
   const [showFarmerModal, setShowFarmerModal] = useState(false);
+  const navigate = useNavigate();
   // test - change to false for initial session invalid state
   // console.log("User: ", user);
   useEffect(() => {
     console.log("Running UseEffect in home.js");
     (async () => {
       let token = sessionStorage.getItem("session_token_farmersapp");
-      const validateSession_x = async () => {
-        const token = sessionStorage.getItem("session_token_farmersapp");
-        let res = await validateSession_call(
-          process.env.REACT_APP_API_URL,
-          token
-        );
-        if (res === false) {
-          setUser(null);
-          return false;
-        }
-        if (res.username) {
-          return res;
-        }
-      };
-      console.log("Validating session in Home.js");
-      let tempSession = await validateSession_x();
-      if (tempSession === false) {
-        console.log("Session is invalid, redirecting to login page.");
-        setIsSessionValid(false);
-        setIsLoading(false);
-        // navigate("/login");
-      } else if (tempSession.username) {
-        console.log("Get usedetails in Home.js");
+      if (token) {
+        console.log("Get user details in Home.js");
         let user_details = await get_my_user_details(
           process.env.REACT_APP_API_URL,
-          token
+          token,
         );
         setUser(user_details);
-        setIsSessionValid(true);
         setIsLoading(true);
         console.log("Fetching products in Home.js");
         let visibleLoads = await get_all_loads(
           process.env.REACT_APP_API_URL,
-          sessionStorage.getItem("session_token_farmersapp")
+          token,
         );
         visibleLoads =
           visibleLoads.length > 0
             ? visibleLoads.filter((product) => {
                 let timeleft = getTimeLeft(
                   product.auction_time_hrs,
-                  product.createdAt
+                  product.createdAt,
                 );
                 if (
                   timeleft === "Ended" ||
@@ -86,7 +56,7 @@ const Home = ({
             : [];
         if (visibleLoads.length > 0) {
           visibleLoads = visibleLoads.filter((product) => {
-            if (product.name === tempSession.username) {
+            if (product.name === user_details?.username) {
               console.log("Own loads: ", product);
               return false;
             } else return true;
@@ -129,7 +99,7 @@ const Home = ({
                     .toLowerCase()
                     .includes(filters.search.toLowerCase()) ||
                   JSON.stringify(product.product_location).includes(
-                    filters.search
+                    filters.search,
                   )
                 ) {
                   console.log("Search found: ", product);
@@ -140,17 +110,10 @@ const Home = ({
             });
           }
         }
-        setIsLoading(false);
       }
+      setIsLoading(false);
     })();
-  }, [
-    isSessionValid,
-    showFarmerModal,
-    showBidModal,
-    filters,
-    setUser,
-    setIsSessionValid,
-  ]);
+  }, [showFarmerModal, showBidModal, filters, setUser]);
   console.log("Fetching products...", products);
   console.log("Fetching user details...", user);
   const handleBidClick = (product) => {
@@ -163,12 +126,12 @@ const Home = ({
     const start_time = new Date(
       created_time.split("T")[0] +
         " " +
-        created_time.split("T")[1].split(".")[0]
+        created_time.split("T")[1].split(".")[0],
     );
     // console.log("Start time:", start_time);
     // console.log("Current time:", now);
     const end_time = new Date(
-      start_time.setHours(start_time.getHours() + auction_hrs)
+      start_time.setHours(start_time.getHours() + auction_hrs),
     );
     // console.log("End time:", end_time);
     const diff = end_time.getTime() - now.getTime();
@@ -187,14 +150,10 @@ const Home = ({
     }
     return `${minutes}mins left`;
   };
-
+  console.log("User: ", user);
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation
-        isSessionValid={isSessionValid}
-        setIsSessionValid={setIsSessionValid}
-        user={user}
-      />
+      <Navigation user={user} />
       <HeroSection setShowFarmerModal={setShowFarmerModal} />
       <SearchFilters onFiltersChange={setFilters} />
       <section id="products" className="py-12">
@@ -232,7 +191,7 @@ const Home = ({
                 products.map((product) => {
                   let timeleft = getTimeLeft(
                     product.auction_time_hrs,
-                    product.createdAt
+                    product.createdAt,
                   );
                   if (
                     timeleft === "Ended" ||
@@ -257,7 +216,7 @@ const Home = ({
           {products.length === 0 && !isLoading && (
             <div className="text-center py-12">
               <p className="text-gray-500 text-lg">
-                {isSessionValid
+                {user
                   ? "No products found."
                   : "Login to view products and place bids."}
               </p>
@@ -273,7 +232,10 @@ const Home = ({
       {/* Floating Action Button */}
       <div className="fixed bottom-6 right-6 z-50  rounded-full ">
         <button
-          onClick={() => setShowFarmerModal(true)}
+          onClick={() => {
+            if (user) setShowFarmerModal(true);
+            else navigate("/login");
+          }}
           className="earth-500 hover:bg-earth-600 text-white w-16 h-16 rounded-full shadow-xl flex items-center justify-center text-xl"
         >
           <Plus className="w-6 h-6" />

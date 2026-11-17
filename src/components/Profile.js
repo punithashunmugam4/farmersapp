@@ -1,16 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  get_my_user_details,
-  update_user_details,
-  validateSession_call,
-} from "../api_call.js";
+import { get_my_user_details, update_user_details } from "../api_call.js";
 import bg from "../assets/background.jpg";
 import Navigation from "./navigation.js";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
+const Profile = ({ user, setUser }) => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const userRef = useRef(null);
@@ -22,37 +18,18 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
     console.log("Running UseEffect in home.js");
     (async () => {
       let token = sessionStorage.getItem("session_token_farmersapp");
-      const validateSession_x = async () => {
-        const token = sessionStorage.getItem("session_token_farmersapp");
-        let res = await validateSession_call(
-          process.env.REACT_APP_API_URL,
-          token
-        );
-        if (res === false) {
-          setUser(null);
-          return false;
-        }
-        if (res.username) {
-          return res;
-        }
-      };
-      console.log("Validating session in Home.js");
-      let tempSession = await validateSession_x();
-      if (tempSession === false) {
-        console.log("Session is invalid, redirecting to login page.");
-        setIsSessionValid(false);
-        navigate("/login");
-      } else if (tempSession.username) {
-        console.log("Get usedetails in Home.js");
+      if (token) {
+        console.log("Get user details in Profile.js");
         let user_details = await get_my_user_details(
           process.env.REACT_APP_API_URL,
-          token
+          token,
         );
         setUser(user_details);
-        setIsSessionValid(true);
+      } else {
+        navigate("/login");
       }
     })();
-  }, [isSessionValid, setIsSessionValid, setUser, navigate]);
+  }, [setUser, navigate]);
 
   const handleChange = (name, value) => {
     setForm((prev) => ({
@@ -71,15 +48,15 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
         contract_users: Array.isArray(form.contract_users)
           ? form.contract_users
           : form?.contract_users.includes(",")
-          ? form.contract_users?.split(",")
-          : [form.contract_users],
+            ? form.contract_users?.split(",")
+            : [form.contract_users],
       };
     }
     const token = sessionStorage.getItem("session_token_farmersapp");
     let response = await update_user_details(
       process.env.REACT_APP_API_URL,
       token,
-      updatedUser
+      updatedUser,
     );
     if (response.status === 201 || response.status === 200) {
       toast.success("🚀 Profile details updated successfully!");
@@ -97,11 +74,7 @@ const Profile = ({ isSessionValid, setIsSessionValid, user, setUser }) => {
       }}
     >
       <div className="min-h-screen">
-        <Navigation
-          isSessionValid={isSessionValid}
-          setIsSessionValid={setIsSessionValid}
-          user={user}
-        />
+        <Navigation user={user} />
         <div className="px-20 py-12 rounded-lg shadow-md flex flex-col justify-center items-center bg-white bg-opacity-60">
           <h2 className="text-lg font-bold text-gray-700 mb-4 text-center">
             Welcome to Your Profile, {user?.username || "User"}!

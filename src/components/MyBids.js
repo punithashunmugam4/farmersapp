@@ -4,19 +4,9 @@ import { MyBidsCard } from "./MyBidsCard.js";
 import { Footer } from "./footer.js";
 import SearchFilters from "./search-filters.js";
 import { useState, useEffect } from "react";
-import {
-  get_my_user_details,
-  get_my_bids,
-  validateSession_call,
-} from "../api_call";
+import { get_my_user_details, get_my_bids } from "../api_call";
 
-const MyBids = ({
-  isSessionValid,
-  setIsSessionValid,
-  validateSession,
-  user,
-  setUser,
-}) => {
+const MyBids = ({ user, setUser }) => {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // test - change to true for initial loading state
   const [filters, setFilters] = useState(null);
@@ -24,44 +14,19 @@ const MyBids = ({
   const [showBidModal, setShowBidModal] = useState(false);
 
   useEffect(() => {
-    console.log("Running UseEffect in home.js");
+    console.log("Running UseEffect in MyBids.js");
     (async () => {
       let token = sessionStorage.getItem("session_token_farmersapp");
-      const validateSession_x = async () => {
-        const token = sessionStorage.getItem("session_token_farmersapp");
-        let res = await validateSession_call(
-          process.env.REACT_APP_API_URL,
-          token
-        );
-        if (res === false) {
-          setUser(null);
-          return false;
-        }
-        if (res.username) {
-          return res;
-        }
-      };
-      console.log("Validating session in Home.js");
-      let tempSession = await validateSession_x();
-      if (tempSession === false) {
-        console.log("Session is invalid, redirecting to login page.");
-        setIsSessionValid(false);
-        setIsLoading(false);
-        // navigate("/login");
-      } else if (tempSession.username) {
-        console.log("Get usedetails in Home.js");
+      if (token) {
+        console.log("Get user details in MyBids.js");
         let user_details = await get_my_user_details(
           process.env.REACT_APP_API_URL,
-          token
+          token,
         );
         setUser(user_details);
-        setIsSessionValid(true);
         setIsLoading(true);
-        console.log("Fetching products in Home.js");
-        let myLoads = await get_my_bids(
-          process.env.REACT_APP_API_URL,
-          sessionStorage.getItem("session_token_farmersapp")
-        );
+        console.log("Fetching bids in MyBids.js");
+        let myLoads = await get_my_bids(process.env.REACT_APP_API_URL, token);
         console.log("Loads got from api call: ", myLoads);
         if (myLoads.length > 0) {
           if (filters === null) {
@@ -102,7 +67,7 @@ const MyBids = ({
                     .toLowerCase()
                     .includes(filters.search.toLowerCase()) ||
                   JSON.stringify(product.product_location).includes(
-                    filters.search
+                    filters.search,
                   )
                 ) {
                   console.log("Search found: ", product);
@@ -116,7 +81,7 @@ const MyBids = ({
         setIsLoading(false);
       }
     })();
-  }, [isSessionValid, showBidModal, filters, setIsSessionValid, setUser]);
+  }, [showBidModal, filters, setUser]);
 
   const handleBidClick = (product, modal) => {
     setSelectedProduct(product);
@@ -125,11 +90,7 @@ const MyBids = ({
 
   return (
     <div id="my-products">
-      <Navigation
-        isSessionValid={isSessionValid}
-        setIsSessionValid={setIsSessionValid}
-        user={user}
-      />
+      <Navigation user={user} />
       <SearchFilters onFiltersChange={setFilters} />
       <section id="products" className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -144,7 +105,7 @@ const MyBids = ({
 
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {[...Array(8)].map((_, i) => (
+              {[...Array(4)].map((_, i) => (
                 <div
                   key={i}
                   className="bg-white rounded-xl shadow-lg overflow-hidden animate-pulse"
